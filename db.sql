@@ -1,4 +1,4 @@
-create table if not exists luvio.user_accounts (
+create table if not exists application.user_accounts (
     id bigserial PRIMARY KEY,
     username varchar(255),
     password_hashed varchar(200), -- https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/
