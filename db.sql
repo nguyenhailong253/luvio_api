@@ -1,8 +1,5 @@
 create table if not exists luvio.user_accounts (
     id bigserial PRIMARY KEY,
-    renter_profile_id bigserial FOREIGN KEY,
-    agent_profile_id bigserial FOREIGN KEY,
-    landlord_profile_id bigserial FOREIGN KEY,
     username varchar(255),
     password_hashed varchar(200), -- https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/
     password_salt varchar(20),

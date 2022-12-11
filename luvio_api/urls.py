@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from luvio_api import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', views.UserAccountViews.as_view()),
 ]
