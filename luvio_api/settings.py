@@ -87,6 +87,10 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+            # https://stackoverflow.com/questions/70602409/how-do-i-change-the-default-schema-to-custom-schema-in-postgres-from-djnago-sett
+            'options': f'-c search_path={env("DB_SCHEMA")}'
+        },
         'NAME': env("DB_NAME"),
         'USER': env("DB_USERNAME"),
         'PASSWORD': env("DB_PASSWORD"),

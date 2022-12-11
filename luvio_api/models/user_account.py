@@ -12,5 +12,11 @@ class UserAccount(models.Model):
     secondary_email = models.CharField(max_length=320)
     mobile = models.CharField(max_length=10)
 
+    class Meta:  # https://docs.djangoproject.com/en/4.1/ref/models/options/
+        db_table = 'user_accounts'
+        # https://stackoverflow.com/questions/16421574/database-table-names-with-django
+        managed = False
+
     def __str__(self):
-        return f"{first_name} {last_name}"
+        # return f"{first_name} {last_name}"
+        return self.username
