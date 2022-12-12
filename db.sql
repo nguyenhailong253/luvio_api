@@ -11,6 +11,22 @@ create table if not exists application.user_accounts (
     mobile varchar(10),
 )
 
+create table if not exists application.profile_types (
+    id bigserial PRIMARY KEY,
+    profile_type varchar(10)
+)
+
+insert into application.profile_types(profile_type) values('landlord')
+
+create table if not exists application.user_profiles (
+    id bigserial PRIMARY KEY,
+    account_id bigserial FOREIGN KEY,
+    profile_type bigserial FOREIGN KEY,
+    avatar_link text,
+    profile_pitch text,
+    profile_url text
+)
+
 -- Relationships:
 
 """

@@ -1,1 +1,1 @@
-from .user_account_view import UserAccountViews
+from .user_account_view import UserAccountView
