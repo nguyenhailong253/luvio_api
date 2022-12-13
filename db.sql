@@ -1,13 +1,11 @@
 create table if not exists application.user_accounts (
     id bigserial PRIMARY KEY,
-    username varchar(255),
-    password_hashed varchar(200), -- https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/
-    password_salt varchar(20),
+    primary_email varchar(320), -- https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+    password_hashed varchar(320), -- https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/
+    password_salt varchar(200),
     first_name varchar(100),
     last_name varchar(100),
     date_of_birth date,
-    primary_email varchar(320), -- https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
-    secondary_email varchar(320),
     mobile varchar(10),
 )
 

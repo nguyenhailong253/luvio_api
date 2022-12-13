@@ -51,7 +51,9 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ]
+    ],
+    # Ref: https://docs.djangoproject.com/en/3.2/ref/settings/#date-input-formats
+    'DATE_INPUT_FORMATS': ['%d/%m/%Y'],
 }
 
 MIDDLEWARE = [

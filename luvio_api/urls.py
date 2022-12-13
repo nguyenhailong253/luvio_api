@@ -20,5 +20,6 @@ from luvio_api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', views.UserAccountViews.as_view()),
+    # Ref: https://stackoverflow.com/questions/9738824/django-post-url-error
+    path('accounts/', views.UserAccountView.as_view()),
 ]
