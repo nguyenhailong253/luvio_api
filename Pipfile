@@ -10,6 +10,7 @@ psycopg2-binary = "*"
 django-environ = "*"
 bcrypt = "*"
 django-oauth-toolkit = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 

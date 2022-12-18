@@ -27,8 +27,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user = UserAccount(
             primary_email=validated_data['primary_email'],
             username=validated_data['username'],
-            password_hashed=hashed_pwd,
-            password_salt=salt,
+            # Ref: https://stackoverflow.com/a/38262440
+            password_hashed=hashed_pwd.decode('utf-8'),
+            password_salt=salt.decode('utf-8'),
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             date_of_birth=validated_data['date_of_birth'],
