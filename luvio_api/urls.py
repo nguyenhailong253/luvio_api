@@ -23,4 +23,5 @@ urlpatterns = [
     path('authenticate/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     # Ref: https://stackoverflow.com/questions/9738824/django-post-url-error
     path('accounts/', views.UserAccountView.as_view()),
+    path('profile-types/', views.ProfileTypeView.as_view()),
 ]
