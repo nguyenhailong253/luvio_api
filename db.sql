@@ -1,28 +1,33 @@
 create table if not exists application.user_accounts (
     id bigserial PRIMARY KEY,
-    primary_email varchar(320), -- https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
-    password_hashed varchar(320), -- https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/
-    password_salt varchar(200),
-    first_name varchar(100),
-    last_name varchar(100),
+    primary_email varchar(320) NOT NULL, -- https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
+    password_hashed varchar(320) NOT NULL, -- https://auth0.com/blog/adding-salt-to-hashing-a-better-way-to-store-passwords/
+    password_salt varchar(200) NOT NULL,
+    first_name varchar(100) NOT NULL,
+    last_name varchar(100) NOT NULL,
     date_of_birth date,
     mobile varchar(10),
+    username varchar(320) NOT NULL
 )
+
+ALTER TABLE application.user_accounts ALTER COLUMN last_name TYPE varchar (100);
+ALTER TABLE application.user_accounts ALTER COLUMN last_name set not null
+UPDATE application.user_accounts SET column_name = 'column value' WHERE column_name = 'column value'
 
 create table if not exists application.profile_types (
     id bigserial PRIMARY KEY,
-    profile_type varchar(10)
+    profile_type varchar(10) NOT NULL
 )
 
 insert into application.profile_types(profile_type) values('landlord')
 
 create table if not exists application.user_profiles (
     id bigserial PRIMARY KEY,
-    account_id bigserial FOREIGN KEY,
-    profile_type bigserial FOREIGN KEY,
+    account_id bigserial NOT NULL,
+    profile_type bigserial NOT NULL,
     avatar_link text,
     profile_pitch text,
-    profile_url text
+    profile_url text NOT NULL
 )
 
 -- Relationships:

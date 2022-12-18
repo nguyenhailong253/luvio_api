@@ -14,12 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from luvio_api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('authenticate/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     # Ref: https://stackoverflow.com/questions/9738824/django-post-url-error
     path('accounts/', views.UserAccountView.as_view()),
 ]

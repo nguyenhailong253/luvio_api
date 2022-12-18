@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'luvio_api',
     'rest_framework',
     'rest_framework.authtoken',
+    'oauth2_provider',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,14 +50,25 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+    # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/rest-framework/getting_started.html
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     # Ref: https://docs.djangoproject.com/en/3.2/ref/settings/#date-input-formats
     'DATE_INPUT_FORMATS': ['%d/%m/%Y'],
 }
 
+AUTHENTICATION_BACKENDS = [
+    # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/tutorial/tutorial_03.html
+    'oauth2_provider.backends.OAuth2Backend',
+]
+
 MIDDLEWARE = [
+    # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/tutorial/tutorial_03.html
+    'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -91,10 +103,6 @@ WSGI_APPLICATION = 'luvio_api.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
@@ -128,6 +136,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'luvio_api.Registration'
+
+OAUTH2_PROVIDER = {
+    # this is the list of available scopes
+    'SCOPES': {'read': 'Read scope', 'write': 'Write scope'}
+}
+
+LOGIN_URL = '/admin/login/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

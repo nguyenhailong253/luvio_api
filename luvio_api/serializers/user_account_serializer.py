@@ -19,16 +19,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
         """
         Create new user account
         """
-        if UserAccount.objects.filter(primary_email=validated_data['primary_email']).exists():
-            raise exceptions.ValidationError(
-                {"message": "This email is already used for another account! Please use a different email address"}, code=400)
+        self.verify_username_and_email(
+            validated_data['username'], validated_data['primary_email'])
         salt = bcrypt.gensalt(rounds=COST_FACTOR)
-        print(f"Salt: {salt}")
         hashed_pwd = bcrypt.hashpw(
             validated_data['password'].encode('utf-8'), salt)
-        print(f"Hashed pwd: {hashed_pwd}")
         user = UserAccount(
             primary_email=validated_data['primary_email'],
+            username=validated_data['username'],
             password_hashed=hashed_pwd,
             password_salt=salt,
             first_name=validated_data['first_name'],
@@ -38,6 +36,14 @@ class RegistrationSerializer(serializers.ModelSerializer):
         )
         user.save()
         return user
+
+    def verify_username_and_email(self, username, email):
+        if UserAccount.objects.filter(primary_email=email).exists():
+            raise exceptions.ValidationError(
+                {"message": "This email is already used for another account! Please use a different email address"}, code=400)
+        if UserAccount.objects.filter(username=username).exists():
+            raise exceptions.ValidationError(
+                {"message": "This username is already used for another account! Please use a different username"}, code=400)
 
 
 class UserAccountSerializer(serializers.ModelSerializer):
