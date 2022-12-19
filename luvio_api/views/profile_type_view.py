@@ -10,7 +10,7 @@ from luvio_api.serializers import ProfileTypeSerializer
 
 
 class ProfileTypeView(APIView):
-    permission_classes = [TokenHasReadWriteScope, IsAuthenticated]
+    permission_classes = [TokenHasReadWriteScope]
 
     def get(self, request: Request, format=None):
         """

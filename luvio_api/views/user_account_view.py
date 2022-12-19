@@ -27,3 +27,11 @@ class UserAccountView(APIView):
             'access': str(jwt_token.access_token),
         }
         return Response(status=200, data=parse_token)
+
+    def get(self, request, format=None):
+        """
+        Get all existing accounts - for testing only
+        """
+        accounts = UserAccount.objects.all()
+        serializer = UserAccountSerializer(accounts, many=True)
+        return Response(serializer.data)
