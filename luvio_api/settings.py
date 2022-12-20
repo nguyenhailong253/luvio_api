@@ -38,9 +38,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'luvio_api',
     'rest_framework',
-    'rest_framework.authtoken',
     'oauth2_provider',
-    'rest_framework_simplejwt',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,7 +52,6 @@ REST_FRAMEWORK = {
     # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/rest-framework/getting_started.html
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
