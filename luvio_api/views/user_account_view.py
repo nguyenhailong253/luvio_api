@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 
 from luvio_api.models import UserAccount
-from luvio_api.serializers import RegistrationSerializer, UserAccountSerializer, JwtTokenSerializer
+from luvio_api.serializers import RegistrationSerializer, UserAccountSerializer
 
 
 class UserAccountView(APIView):
@@ -20,13 +20,7 @@ class UserAccountView(APIView):
         serializer = RegistrationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        jwt_token = JwtTokenSerializer(
-            data=request.data).get_token(user)
-        parse_token = {
-            'refresh': str(jwt_token),
-            'access': str(jwt_token.access_token),
-        }
-        return Response(status=200, data=parse_token)
+        return Response(status=200, data=user)
 
     def get(self, request, format=None):
         """
