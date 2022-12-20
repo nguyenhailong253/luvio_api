@@ -30,9 +30,9 @@ SECRET_KEY = 'django-insecure-&a5)o7dvzmwkjg=*i=&elp^#t!*c_usk83v4$)-a3v71erj2@6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
+# ALLOWED_HOSTS = ['*']
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SECURE = False
 # Application definition
 
 INSTALLED_APPS = [
@@ -63,6 +63,7 @@ REST_FRAMEWORK = {
 AUTHENTICATION_BACKENDS = [
     # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/tutorial/tutorial_03.html
     'oauth2_provider.backends.OAuth2Backend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -139,7 +140,14 @@ AUTH_USER_MODEL = 'luvio_api.Registration'
 
 OAUTH2_PROVIDER = {
     # this is the list of available scopes
-    'SCOPES': {'read': 'Read scope', 'write': 'Write scope'}
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+        'openid': "OpenID Connect scope",
+    },
+    "OIDC_ENABLED": True,
+    "OIDC_RSA_PRIVATE_KEY": env("OIDC_RSA_PRIVATE_KEY"),
+    "OAUTH2_VALIDATOR_CLASS": "luvio_api.oidc.CustomOAuth2Validator",
 }
 
 LOGIN_URL = '/admin/login/'
