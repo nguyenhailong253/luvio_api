@@ -15,12 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.authtoken import views as auth_views
 
 from luvio_api import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('oauth2/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('login/', views.LoginView.as_view()),
+    path('registration/', views.RegistrationView.as_view()),
 
     # Ref: https://stackoverflow.com/questions/9738824/django-post-url-error
     path('accounts/', views.UserAccountView.as_view()),

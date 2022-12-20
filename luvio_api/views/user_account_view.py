@@ -2,27 +2,17 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 
 from luvio_api.models import UserAccount
-from luvio_api.serializers import RegistrationSerializer, UserAccountSerializer
+from luvio_api.serializers import UserAccountSerializer
 
 
 class UserAccountView(APIView):
-    # Setting a class attribute to override the default permissions_classes with something that will use our Access Token properly.
-    # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/tutorial/tutorial_03.html
-    permission_classes = [TokenHasReadWriteScope]
+    permission_classes = [IsAuthenticated]
 
-    def post(self, request: Request):
-        """
-        Create new user account
-        """
-        serializer = RegistrationSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response(status=200, data=user)
-
-    def get(self, request, format=None):
+    def get(self, request: Request, format=None):
         """
         Get all existing accounts - for testing only
         """

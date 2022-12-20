@@ -1,2 +1,2 @@
-from .user_account_serializer import UserAccountSerializer, RegistrationSerializer
+from .user_account_serializer import UserAccountSerializer
 from .profile_type_serializer import ProfileTypeSerializer

@@ -1,3 +1,3 @@
 # https://stackoverflow.com/a/47740087
-from .user_account import UserAccount, Registration
+from .user_account import UserAccount
 from .profile_type import ProfileType
