@@ -38,7 +38,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'luvio_api',
     'rest_framework',
-    'oauth2_provider',
+    'rest_framework.authtoken',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,9 +49,8 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/rest-framework/getting_started.html
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -60,14 +59,11 @@ REST_FRAMEWORK = {
     'DATE_INPUT_FORMATS': ['%d/%m/%Y'],
 }
 
-AUTHENTICATION_BACKENDS = [
-    # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/tutorial/tutorial_03.html
-    'oauth2_provider.backends.OAuth2Backend',
-]
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 MIDDLEWARE = [
-    # Ref: https://django-oauth-toolkit.readthedocs.io/en/latest/tutorial/tutorial_03.html
-    'oauth2_provider.middleware.OAuth2TokenMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -126,6 +122,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 12,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -135,12 +134,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'luvio_api.Registration'
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.ScryptPasswordHasher',
+]
 
-OAUTH2_PROVIDER = {
-    # this is the list of available scopes
-    'SCOPES': {'read': 'Read scope', 'write': 'Write scope'}
-}
+AUTH_USER_MODEL = 'luvio_api.UserAccount'
 
 LOGIN_URL = '/admin/login/'
 
