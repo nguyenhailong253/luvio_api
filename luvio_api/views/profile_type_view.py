@@ -9,7 +9,6 @@ from luvio_api.serializers import ProfileTypeSerializer
 
 
 class ProfileTypeView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, format=None):
         """

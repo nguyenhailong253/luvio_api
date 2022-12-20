@@ -10,7 +10,6 @@ from luvio_api.serializers import UserAccountSerializer
 
 
 class UserAccountView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request, format=None):
         """
