@@ -60,7 +60,7 @@ class UserProfileDetailView(APIView):
         """
         # Ref: https://stackoverflow.com/a/12615192/8749888
         current_user = request.user
-        profile = get_object_or_404(UserProfile, id=id, account=current_user)
+        profile = get_object_or_404(UserProfile, pk=id, account=current_user)
         serializer = UserProfileSerializer(profile)
         return Response(serializer.data)
 
@@ -69,7 +69,7 @@ class UserProfileDetailView(APIView):
         Update an existing profile
         """
         current_user = request.user
-        profile = get_object_or_404(UserProfile, id=id, account=current_user)
+        profile = get_object_or_404(UserProfile, pk=id, account=current_user)
         profile.avatar_link = request.data.get(
             'avatar_link', profile.avatar_link)
         profile.profile_pitch = request.data.get(
@@ -84,7 +84,7 @@ class UserProfileDetailView(APIView):
         Delete an existing profile
         """
         current_user = request.user
-        profile = get_object_or_404(UserProfile, id=id, account=current_user)
+        profile = get_object_or_404(UserProfile, pk=id, account=current_user)
         profile.delete()
         return Response({
             'message': "Successfully deleted profile!",
