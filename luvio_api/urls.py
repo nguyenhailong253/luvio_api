@@ -26,5 +26,7 @@ urlpatterns = [
 
     # Ref: https://stackoverflow.com/questions/9738824/django-post-url-error
     path('accounts/', views.UserAccountView.as_view()),
+    path('profiles/<int:id>', views.UserProfileDetailView.as_view()),
+    path('profiles/', views.UserProfileListView.as_view()),
     path('profile-types/', views.ProfileTypeView.as_view()),
 ]

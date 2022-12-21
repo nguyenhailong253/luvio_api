@@ -17,15 +17,11 @@ class LoginView(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         payload = request.data
         password = payload.get('password', None)
-        if payload.get('email', None):
-            username = UserAccount.objects.get(email=payload['email']).username
-        username = payload.get('username')
+        username = self.get_username(payload)
         user = authenticate(request,
                             username=username, password=password)
         if user is not None:
-            print(f"user: {user}")
             token, created = Token.objects.get_or_create(user=user)
-            print(f"token: {token}")
             return Response({
                 'token': token.key,
                 'user_id': user.pk,
@@ -35,3 +31,8 @@ class LoginView(ObtainAuthToken):
         else:
             raise exceptions.NotAuthenticated(
                 "User not found - unable to authenticate!")
+
+    def get_username(self, payload: dict) -> str:
+        if payload.get('email', None):
+            return UserAccount.objects.get(email=payload['email']).username
+        return payload.get('username', None)

@@ -9,7 +9,7 @@ class UserAccount(AbstractUser):
     # Ref: https://stackoverflow.com/questions/22586897/creating-custom-fields-with-django-allauth
     # Ref: https://stackoverflow.com/a/59310643
     REQUIRED_FIELDS = ('email', 'password', 'first_name', 'last_name',
-                       'date_of_birth')
+                       'date_of_birth', 'is_active')
     # Ref: https://stackoverflow.com/questions/51308530/attributeerror-type-object-myuser-has-no-attribute-username-field
     USERNAME_FIELD = 'username'
 
