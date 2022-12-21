@@ -13,7 +13,8 @@ class UserProfile(models.Model):
         max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True)
     profile_pitch = models.CharField(
         max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True)
-    profile_url = models.CharField(max_length=TEXT_FIELD_MAX_LENGTH)
+    profile_url = models.CharField(
+        max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True)
 
     def __str__(self):
         return self.profile_url
