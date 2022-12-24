@@ -9,7 +9,7 @@ from luvio_api.serializers import UserAccountSerializer
 
 
 class UserAccountView(APIView):
-    def get(self):
+    def get(self, request: Request):
         """
         Get all existing accounts - for testing only
         """

@@ -18,7 +18,7 @@ class LoginView(ObtainAuthToken):
         username = self._get_username(payload)
         user = authenticate(request, username=username, password=password)
         if user is not None:
-            token = Token.objects.get_or_create(user=user)
+            token, _ = Token.objects.get_or_create(user=user)
             return Response(
                 {
                     "token": token.key,

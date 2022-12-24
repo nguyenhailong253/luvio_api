@@ -13,6 +13,7 @@ disable =
     W0622, # redefined-builtin
     R0801, # similar lines in 2 files
     W0511, # todo
+    R,C # Ref: https://stackoverflow.com/a/31908039/8749888
 ignore=migrations,settings.py
 # When enabled, pylint would attempt to guess common misconfiguration and emit
 # user-friendly hints instead of false-positive error messages.
