@@ -1,10 +1,9 @@
 import json
 from datetime import datetime
 from django.test import TestCase
-from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework import status
+from rest_framework.test import APIClient
 
-from luvio_api.views import UserAccountView
 from luvio_api.models import UserAccount
 
 
@@ -33,14 +32,16 @@ class UserAccountTestCase(TestCase):
             date_of_birth="2022-01-01",
             is_active=True,
         )
-        cls.factory = APIRequestFactory()
-        cls.view = UserAccountView.as_view()
+
+    def setUp(self):
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.default_user)
 
     def test_update_user(self):
         """
         Test update existing user
         """
-        request = self.factory.put(
+        response = self.client.put(
             "/accounts/",
             {
                 "email": "default@default.com",
@@ -50,10 +51,7 @@ class UserAccountTestCase(TestCase):
                 "date_of_birth": "2022-01-02",
                 "mobile": "0412345678",
             },
-        )
-        force_authenticate(request, self.default_user)
-        response = self.view(request)
-        response.render()
+        ).render()
 
         updated_user = UserAccount.objects.get(email="default@default.com")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -67,15 +65,12 @@ class UserAccountTestCase(TestCase):
         """
         Test update user with username same with other user
         """
-        request = self.factory.put(
+        response = self.client.put(
             "/accounts/",
             {
                 "username": "another_default_user",
             },
-        )
-        force_authenticate(request, self.default_user)
-        response = self.view(request)
-        response.render()
+        ).render()
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -83,15 +78,12 @@ class UserAccountTestCase(TestCase):
         """
         Test update user with email same with other user
         """
-        request = self.factory.put(
+        response = self.client.put(
             "/accounts/",
             {
                 "email": "another_default@default.com",
             },
-        )
-        force_authenticate(request, self.default_user)
-        response = self.view(request)
-        response.render()
+        ).render()
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 

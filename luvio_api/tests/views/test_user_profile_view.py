@@ -2,8 +2,8 @@ import json
 from datetime import datetime
 from django.urls import reverse
 from django.test import TestCase
-from rest_framework.test import APIRequestFactory, force_authenticate, APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
 from luvio_api.models import UserAccount, UserProfile, ProfileType
 
