@@ -11,6 +11,9 @@ django-environ = "*"
 bcrypt = "*"
 
 [dev-packages]
+pylint = "*"
+pylint-django = "*"
+black = "*"
 
 [requires]
 python_version = "3.10"

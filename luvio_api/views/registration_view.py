@@ -1,3 +1,4 @@
+from rest_framework import status
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.request import Request
@@ -20,9 +21,12 @@ class RegistrationView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         token = Token.objects.create(user=user)
-        return Response({
-            'token': token.key,
-            'user_id': user.id,
-            'email': user.email,
-            'username': user.username,
-        })
+        return Response(
+            {
+                "token": token.key,
+                "user_id": user.id,
+                "email": user.email,
+                "username": user.username,
+            },
+            status=status.HTTP_201_CREATED,
+        )
