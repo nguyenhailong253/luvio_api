@@ -23,7 +23,7 @@ class UserAccountView(APIView):
 
     def put(self, request: Request):
         """
-        Update an existing account
+        Update an existing account's details (excluding password)
         """
         current_account = request.user
         account = get_object_or_404(UserAccount, pk=current_account.id)
@@ -38,5 +38,5 @@ class UserAccountView(APIView):
             account.save()
         except Exception as e:
             raise exceptions.ValidationError(
-                {'message': f'Unable to update account - email or username is already being used by another account - {e}'})
+                {'message': f'Unable to update account - {e}'})
         return Response({'message': 'Successfully updated account!'})

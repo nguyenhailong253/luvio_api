@@ -10,7 +10,7 @@ from luvio_api.serializers import ProfileTypeSerializer
 
 class ProfileTypeView(APIView):
 
-    def get(self, request: Request, format=None):
+    def get(self, request: Request):
         """
         Get all account profile types
         e.g renter, landlord, agent

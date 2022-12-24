@@ -57,6 +57,7 @@ REST_FRAMEWORK = {
     ),
     # Ref: https://docs.djangoproject.com/en/3.2/ref/settings/#date-input-formats
     'DATE_INPUT_FORMATS': ['%d/%m/%Y'],
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -101,14 +102,18 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'OPTIONS': {
-            # https://stackoverflow.com/questions/70602409/how-do-i-change-the-default-schema-to-custom-schema-in-postgres-from-djnago-sett
-            'options': f'-c search_path={env("DB_SCHEMA")}'
+            # https://stackoverflow.com/a/74056139/8749888
+            'options': f"-c search_path={env('DB_SCHEMA')},public"
         },
         'NAME': env("DB_NAME"),
         'USER': env("DB_USERNAME"),
         'PASSWORD': env("DB_PASSWORD"),
         'HOST': env("DB_HOST"),
         'PORT': env("DB_PORT"),
+        'TEST': {
+            # https://stackoverflow.com/a/59811952/8749888
+            'NAME': 'luvio_api_test', # test database name
+        },
     }
 }
 
