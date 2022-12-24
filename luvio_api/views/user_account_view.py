@@ -1,8 +1,5 @@
-from django.http import JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import exceptions
-from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,7 +9,7 @@ from luvio_api.serializers import UserAccountSerializer
 
 
 class UserAccountView(APIView):
-    def get(self, request: Request):
+    def get(self):
         """
         Get all existing accounts - for testing only
         """

@@ -1,6 +1,3 @@
-from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -9,7 +6,7 @@ from luvio_api.serializers import ProfileTypeSerializer
 
 
 class ProfileTypeView(APIView):
-    def get(self, request: Request):
+    def get(self):
         """
         Get all account profile types
         e.g renter, landlord, agent

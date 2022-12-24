@@ -10,4 +10,7 @@ test:
 
 format:
 	pipenv run isort .
-	
+	pipenv run black .
+
+lint:
+	pipenv run pylint ./luvio_api --fail-under=9

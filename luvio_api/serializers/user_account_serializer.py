@@ -1,5 +1,4 @@
-import bcrypt
-from rest_framework import exceptions, serializers
+from rest_framework import serializers
 
 from luvio_api.models import UserAccount
 

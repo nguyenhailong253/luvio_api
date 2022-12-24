@@ -1,8 +1,5 @@
-from django.http import JsonResponse
 from django.shortcuts import get_list_or_404, get_object_or_404
-from rest_framework import exceptions, status
-from rest_framework.authtoken.models import Token
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -89,7 +86,7 @@ class UserProfileDetailView(APIView):
         """
         Delete an existing profile
         """
-        profile = self._get_profile(id, request.user).delete()
+        self._get_profile(id, request.user).delete()
         return Response(
             {
                 "message": "Successfully deleted profile!",
