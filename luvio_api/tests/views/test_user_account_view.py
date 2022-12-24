@@ -87,6 +87,48 @@ class UserAccountTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_change_password(self):
+        """
+        Test change user password
+        """
+        response = self.client.put(
+            "/accounts/password/",
+            {
+                "old_password": "default_pw",
+                "new_password": "new_pw",
+            },
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_change_password_with_incorrect_old_password(self):
+        """
+        Test change user password
+        """
+        response = self.client.put(
+            "/accounts/password/",
+            {
+                "old_password": "wrong pwd",
+                "new_password": "new_pw",
+            },
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_change_password_with_no_new_password(self):
+        """
+        Test change user password
+        """
+        response = self.client.put(
+            "/accounts/password/",
+            {
+                "old_password": "default_pw",
+                "new_password": "",
+            },
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 if __name__ == "__main__":
     unittest.main()
