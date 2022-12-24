@@ -7,7 +7,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import exceptions, status
 
-from luvio_api.models import UserProfile
+from luvio_api.models import UserProfile, UserAccount
 from luvio_api.serializers import UserProfileSerializer
 
 
@@ -45,7 +45,7 @@ class UserProfileListView(APIView):
             'message': "Successfully created profile!",
             'profile_url': profile.profile_url,
             'profile_id': profile.id,
-        })
+        }, status=status.HTTP_201_CREATED)
 
     def _generate_profile_url(self):
         pass
@@ -59,8 +59,7 @@ class UserProfileDetailView(APIView):
         Get existing profile of the logged in account based on profile id
         """
         # Ref: https://stackoverflow.com/a/12615192/8749888
-        current_user = request.user
-        profile = get_object_or_404(UserProfile, pk=id, account=current_user)
+        profile = self._get_profile(id, request.user)
         serializer = UserProfileSerializer(profile)
         return Response(serializer.data)
 
@@ -68,8 +67,7 @@ class UserProfileDetailView(APIView):
         """
         Update an existing profile
         """
-        current_user = request.user
-        profile = get_object_or_404(UserProfile, pk=id, account=current_user)
+        profile = self._get_profile(id, request.user)
         profile.avatar_link = request.data.get(
             'avatar_link', profile.avatar_link)
         profile.profile_pitch = request.data.get(
@@ -83,9 +81,10 @@ class UserProfileDetailView(APIView):
         """
         Delete an existing profile
         """
-        current_user = request.user
-        profile = get_object_or_404(UserProfile, pk=id, account=current_user)
-        profile.delete()
+        profile = self._get_profile(id, request.user).delete()
         return Response({
             'message': "Successfully deleted profile!",
         })
+
+    def _get_profile(self, id: int, account: UserAccount):
+        return get_object_or_404(UserProfile, pk=id, account=account)
