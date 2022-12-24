@@ -10,8 +10,7 @@ from luvio_api.models import UserAccount
 class RegistrationViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Set up data for the whole TestCase
-        cls.user_accounts = UserAccount.objects.create(
+        UserAccount.objects.create(
             email="default@default.com",
             username="default_user",
             password="default_pw",
@@ -24,7 +23,9 @@ class RegistrationViewTestCase(TestCase):
         cls.view = RegistrationView.as_view()
 
     def test_register_account(self):
-
+        """
+        Test successfully register an account
+        """
         request = self.factory.post(
             "/registration/",
             {
@@ -48,7 +49,9 @@ class RegistrationViewTestCase(TestCase):
         self.assertTrue(resp_body["user_id"])
 
     def test_register_account_already_existed(self):
-
+        """
+        Test registration when account email or username already exist
+        """
         request = self.factory.post(
             "/registration/",
             {

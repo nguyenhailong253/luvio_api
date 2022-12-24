@@ -29,7 +29,7 @@ class LoginView(ObtainAuthToken):
                 'username': user.username,
             })
         else:
-            raise exceptions.NotAuthenticated(
+            raise exceptions.NotFound(
                 "User not found - unable to authenticate!")
 
     def get_username(self, payload: dict) -> str:
