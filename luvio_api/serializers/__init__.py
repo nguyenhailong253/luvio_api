@@ -1,3 +1,3 @@
-from .user_account_serializer import UserAccountSerializer
 from .profile_type_serializer import ProfileTypeSerializer
+from .user_account_serializer import UserAccountSerializer
 from .user_profile_serializer import UserProfileSerializer
