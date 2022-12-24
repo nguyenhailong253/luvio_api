@@ -20,14 +20,17 @@ from rest_framework.authtoken import views as auth_views
 from luvio_api import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('login/', views.LoginView.as_view(), name='login'),
-    path('registration/', views.RegistrationView.as_view(), name='registration'),
-
+    path("admin/", admin.site.urls),
+    path("login/", views.LoginView.as_view(), name="login"),
+    path("registration/", views.RegistrationView.as_view(), name="registration"),
     # Ref: https://stackoverflow.com/a/9744268/8749888 - end slash
     # Ref: https://stackoverflow.com/a/51922669/8749888 - name attribute
-    path('accounts/', views.UserAccountView.as_view(), name='accounts'),
-    path('profiles/<int:id>/', views.UserProfileDetailView.as_view(), name='profile-detail'),
-    path('profiles/', views.UserProfileListView.as_view(), name='profiles'),
-    path('profile-types/', views.ProfileTypeView.as_view(), name='profile-types'),
+    path("accounts/", views.UserAccountView.as_view(), name="accounts"),
+    path(
+        "profiles/<int:id>/",
+        views.UserProfileDetailView.as_view(),
+        name="profile-detail",
+    ),
+    path("profiles/", views.UserProfileListView.as_view(), name="profiles"),
+    path("profile-types/", views.ProfileTypeView.as_view(), name="profile-types"),
 ]

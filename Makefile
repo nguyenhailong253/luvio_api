@@ -7,3 +7,7 @@ migrate:
 
 test:
 	pipenv run python -m manage test --noinput --verbosity 2
+
+format:
+	pipenv run isort .
+	

@@ -5,7 +5,6 @@ from luvio_api.models import UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = UserProfile
-        fields = '__all__'
+        fields = "__all__"

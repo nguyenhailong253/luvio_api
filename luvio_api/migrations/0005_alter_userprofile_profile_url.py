@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('luvio_api', '0004_alter_userprofile_avatar_link_and_more'),
+        ("luvio_api", "0004_alter_userprofile_avatar_link_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userprofile',
-            name='profile_url',
+            model_name="userprofile",
+            name="profile_url",
             field=models.CharField(blank=True, max_length=3000, null=True),
         ),
     ]
