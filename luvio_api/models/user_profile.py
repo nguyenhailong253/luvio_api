@@ -1,7 +1,7 @@
 from django.db import models
-from luvio_api.common.constants import TEXT_FIELD_MAX_LENGTH
 
-from luvio_api.models import UserAccount, ProfileType
+from luvio_api.common.constants import TEXT_FIELD_MAX_LENGTH
+from luvio_api.models import ProfileType, UserAccount
 
 
 class UserProfile(models.Model):

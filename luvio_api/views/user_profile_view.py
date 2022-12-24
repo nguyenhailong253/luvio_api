@@ -1,13 +1,13 @@
-from django.shortcuts import get_object_or_404, get_list_or_404
 from django.http import JsonResponse
-from rest_framework.views import APIView
-from rest_framework.request import Request
-from rest_framework.response import Response
+from django.shortcuts import get_list_or_404, get_object_or_404
+from rest_framework import exceptions, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import exceptions, status
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
-from luvio_api.models import UserProfile, UserAccount
+from luvio_api.models import UserAccount, UserProfile
 from luvio_api.serializers import UserProfileSerializer
 
 

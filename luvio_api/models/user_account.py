@@ -1,6 +1,11 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from luvio_api.common.constants import INVALID_EMAIL, EMAIL_FIELD_MAX_LENGTH, NAME_FIELD_MAX_LENGTH, PASSWORD_MAX_LENGTH, PWD_SALT_MAX_LENGTH, AU_MOBILE_MAX_LENGTH
+from django.db import models
+
+from luvio_api.common.constants import (AU_MOBILE_MAX_LENGTH,
+                                        EMAIL_FIELD_MAX_LENGTH, INVALID_EMAIL,
+                                        NAME_FIELD_MAX_LENGTH,
+                                        PASSWORD_MAX_LENGTH,
+                                        PWD_SALT_MAX_LENGTH)
 
 # Ref: https://docs.djangoproject.com/en/4.1/ref/contrib/auth/
 

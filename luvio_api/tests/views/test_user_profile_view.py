@@ -1,11 +1,12 @@
 import json
 from datetime import datetime
-from django.urls import reverse
+
 from django.test import TestCase
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from luvio_api.models import UserAccount, UserProfile, ProfileType
+from luvio_api.models import ProfileType, UserAccount, UserProfile
 
 
 class UserProfileTestCase(TestCase):
