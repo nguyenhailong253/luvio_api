@@ -47,7 +47,7 @@ class UserProfileListView(APIView):
             'profile_id': profile.id,
         })
 
-    def generate_profile_url(self):
+    def _generate_profile_url(self):
         pass
         # TODO: implement url generation (unique for each profile)
 
