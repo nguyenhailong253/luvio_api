@@ -27,7 +27,9 @@ class LoginView(ObtainAuthToken):
                     "username": user.username,
                 }
             )
-        raise exceptions.NotFound("User not found - unable to authenticate!")
+        raise exceptions.NotFound(
+            "Incorrect username or password - unable to authenticate!"
+        )
 
     def _get_username(self, payload: dict) -> str:
         if payload.get("email", None):

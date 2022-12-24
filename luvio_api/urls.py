@@ -24,6 +24,7 @@ urlpatterns = [
     path("registration/", views.RegistrationView.as_view(), name="registration"),
     # Ref: https://stackoverflow.com/a/9744268/8749888 - end slash
     # Ref: https://stackoverflow.com/a/51922669/8749888 - name attribute
+    path("accounts/password/", views.change_password, name="change-password"),
     path("accounts/", views.UserAccountView.as_view(), name="accounts"),
     path(
         "profiles/<int:id>/",

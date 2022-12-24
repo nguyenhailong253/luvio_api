@@ -24,7 +24,6 @@ class LoginViewTestCase(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.client.force_authenticate(user=self.default_user)
 
     def test_login_with_username(self):
         """
