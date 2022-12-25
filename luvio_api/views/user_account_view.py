@@ -39,6 +39,7 @@ class UserAccountView(APIView):
         return Response({"message": "Successfully updated account!"})
 
 
+# Ref: https://stackoverflow.com/a/33389526/8749888
 @api_view(["PUT"])
 def change_password(request: Request):
     current_account = request.user
