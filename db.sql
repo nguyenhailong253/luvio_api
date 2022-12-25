@@ -71,3 +71,23 @@ things inside a profile
 - endorsements                  -> another table, profile id of endorser, endorse content/message, for which address, relationship with endorser, endorsed date
 - profile_url                   -> unique url for each profile, can be easily shared (maybe a tinyurl as well)
 """
+
+
+"""
+- is_current_residential: default is False. No need to have at least 1 True. You could be overseas for a while and not live anywhere in Aus
+- start_date: 
+  - for when is_current_residential is True
+    - You can't have the same start LIVING date for multiple addresses (can't live in multiple places at the same time)
+    - You can have multiple addresses to a profile as long as the start date is different
+
+
+- Can break into 3 tables
+  - tenant_profiles_addresses
+    - move in and move out date
+  - agent_profiles_addresses
+    - start managed and stop managed date
+  - owner_profiles_addresses
+    - is_current_residential
+    - start date, end date
+
+"""
