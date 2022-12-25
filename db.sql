@@ -1,3 +1,4 @@
+
 create table if not exists application.user_accounts (
     id bigserial PRIMARY KEY,
     primary_email varchar(320) NOT NULL, -- https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address

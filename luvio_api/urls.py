@@ -33,4 +33,9 @@ urlpatterns = [
     ),
     path("profiles/", views.UserProfileListView.as_view(), name="profiles"),
     path("profile-types/", views.ProfileTypeView.as_view(), name="profile-types"),
+    path(
+        "addresses/suggestions/",
+        views.get_address_suggestions,
+        name="address-suggestions",
+    ),
 ]

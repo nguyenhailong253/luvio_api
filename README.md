@@ -14,3 +14,6 @@ API for Luvio app
 - [Testing tools](https://docs.djangoproject.com/en/4.1/topics/testing/tools/#simpletestcase)
 
 - [Don't include **init**() in your root folder](https://stackoverflow.com/a/22096628/8749888)
+
+## Folder structure
+- [Best Practice](https://stackoverflow.com/a/23469321/8749888)
