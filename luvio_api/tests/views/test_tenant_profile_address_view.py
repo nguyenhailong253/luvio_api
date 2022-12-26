@@ -58,7 +58,7 @@ class UserProfileTestCase(TestCase):
             street_type="Road",
             street_type_abbrev="Rd",
         )
-        cls.address = Address.objects.create(
+        cls.address1 = Address.objects.create(
             display_address="789 Brian Boulevard, New Suburb VIC 1100",
             suburb=cls.suburb,
             unit_number=None,
@@ -67,14 +67,30 @@ class UserProfileTestCase(TestCase):
             street_type="Boulevard",
             street_type_abbrev="Bvd",
         )
+        cls.address2 = Address.objects.create(
+            display_address="911 Emergency Lane, New Suburb VIC 1100",
+            suburb=cls.suburb,
+            unit_number=None,
+            street_number="911",
+            street_name="Emergency",
+            street_type="Lane",
+            street_type_abbrev="Ln",
+        )
 
         # Create address already linked to profile
-        TenantProfilesAddresses.objects.create(
+        cls.profileAddressEntry1 = TenantProfilesAddresses.objects.create(
             profile=cls.tenant_profile,
-            address=cls.address,
+            address=cls.address1,
             move_in_date="2022-12-31",
             move_out_date=None,
             is_current_residence=True,
+        )
+        cls.profileAddressEntry2 = TenantProfilesAddresses.objects.create(
+            profile=cls.tenant_profile,
+            address=cls.address2,
+            move_in_date="2025-01-01",
+            move_out_date="2026-01-01",
+            is_current_residence=False,
         )
 
     def setUp(self):
@@ -83,10 +99,10 @@ class UserProfileTestCase(TestCase):
 
     def test_link_address_to_profile(self):
         """
-        Test
+        Test successfully link an address to current profile
         """
         response = self.client.post(
-            f"/profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
             {
                 "address": "1/123 John Street, Fake Suburb VIC 1000",
                 "unitNumber": "1",
@@ -115,10 +131,10 @@ class UserProfileTestCase(TestCase):
 
     def test_link_address_to_profile_when_move_out_date_is_none(self):
         """
-        Test
+        Test successfully link an address to current profile even when move_out_date is none
         """
         response = self.client.post(
-            f"/profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
             {
                 "address": "2/345 Mary Road, New Suburb VIC 1100",
                 "unitNumber": "2",
@@ -147,10 +163,10 @@ class UserProfileTestCase(TestCase):
 
     def test_link_address_to_profile_when_same_address_and_move_in_date(self):
         """
-        Test
+        Test unable to link an address to current profile if same address and move_in_date with other entries
         """
         response = self.client.post(
-            f"/profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
             {
                 "address": "789 Brian Boulevard, New Suburb VIC 1100",
                 "unitNumber": None,
@@ -168,6 +184,75 @@ class UserProfileTestCase(TestCase):
         ).render()
 
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    def test_update_address_in_profile(self):
+        """
+        Test successfully update address in current profile
+        """
+        response = self.client.put(
+            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            {
+                "profileAddressId": self.profileAddressEntry1.id,
+                "address": "789 Brian Boulevard, New Suburb VIC 1100",
+                "unitNumber": None,
+                "streetNumber": "789",
+                "streetName": "Brian",
+                "streetTypeLong": "Boulevard",
+                "streetType": "Bvd",
+                "suburb": "New Suburb",
+                "postCode": "1100",
+                "state": "VIC",
+                "moveInDate": "2022-12-31",
+                "moveOutDate": "2023-12-31",
+                "isCurrentResidence": True,
+            },
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            TenantProfilesAddresses.objects.get(
+                pk=self.profileAddressEntry1.id
+            ).move_out_date.strftime("%Y-%m-%d"),
+            "2023-12-31",
+        )
+
+    def test_update_address_in_profile_when_same_address_and_move_in_date(self):
+        """
+        Test unable to update address in current profile when other entries have the same address and move in date
+        """
+        response = self.client.put(
+            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            {
+                "profileAddressId": self.profileAddressEntry2.id,
+                "address": "789 Brian Boulevard, New Suburb VIC 1100",
+                "unitNumber": None,
+                "streetNumber": "789",
+                "streetName": "Brian",
+                "streetTypeLong": "Boulevard",
+                "streetType": "Bvd",
+                "suburb": "New Suburb",
+                "postCode": "1100",
+                "state": "VIC",
+                "moveInDate": "2022-12-31",
+                "moveOutDate": "2023-12-31",
+                "isCurrentResidence": True,
+            },
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    def test_delete_address_in_profile(self):
+        """
+        Test delete address in current profile
+        """
+        response = self.client.delete(
+            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            {
+                "profileAddressId": self.profileAddressEntry2.id,
+            },
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
 
 if __name__ == "__main__":

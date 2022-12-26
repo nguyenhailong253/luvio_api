@@ -33,7 +33,7 @@ urlpatterns = [
     ),
     path("profiles/", views.UserProfileListView.as_view(), name="profiles"),
     path(
-        "profiles/<int:profile_id>/addresses/",
+        "profiles/tenant-profiles/<int:profile_id>/addresses/",
         views.TenantProfilesAddressesView.as_view(),
         name="tenant-profiles-addresses",
     ),

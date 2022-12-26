@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -106,3 +107,111 @@ class TenantProfilesAddressesView(APIView):
             {"message": "Successfully linked address to current profile"},
             status=status.HTTP_201_CREATED,
         )
+
+    def put(self, request: Request, profile_id: int):
+        """
+        Update exisitng address on current profile
+        """
+        state = StateAndTerritory.objects.get(
+            state_code=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["state"])
+        )
+
+        if Suburb.objects.filter(
+            state_and_territory=state,
+            name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
+            postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
+        ).exists():
+            suburb = Suburb.objects.get(
+                state_and_territory=state,
+                name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
+                postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
+            )
+        else:
+            suburb = Suburb.objects.create(
+                state_and_territory=state,
+                name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
+                postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
+            )
+
+        if Address.objects.filter(
+            suburb=suburb,
+            unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
+            street_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_number"]),
+            street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
+            street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
+            street_type_abbrev=request.data.get(
+                DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
+            ),
+        ).exists():
+            address = Address.objects.get(
+                suburb=suburb,
+                unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
+                street_number=request.data.get(
+                    DOMAIN_API_PAYLOAD_FIELDS["street_number"]
+                ),
+                street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
+                street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
+                street_type_abbrev=request.data.get(
+                    DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
+                ),
+            )
+        else:
+            address = Address.objects.create(
+                suburb=suburb,
+                display_address=request.data.get(
+                    DOMAIN_API_PAYLOAD_FIELDS["display_address"]
+                ),
+                unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
+                street_number=request.data.get(
+                    DOMAIN_API_PAYLOAD_FIELDS["street_number"]
+                ),
+                street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
+                street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
+                street_type_abbrev=request.data.get(
+                    DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
+                ),
+            )
+
+        profile_address_id = request.data.get("profileAddressId")
+        profile_address = get_object_or_404(
+            TenantProfilesAddresses, pk=profile_address_id
+        )
+        profile_address.address = address
+        profile_address.move_in_date = request.data.get(
+            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"],
+            profile_address.move_in_date,
+        )
+        profile_address.move_out_date = request.data.get(
+            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"],
+            profile_address.move_out_date,
+        )
+        profile_address.is_current_residence = request.data.get(
+            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"],
+            profile_address.is_current_residence,
+        )
+
+        if (
+            TenantProfilesAddresses.objects.filter(
+                profile=profile_id,
+                address=address,
+                move_in_date=profile_address.move_in_date,
+            )
+            .exclude(pk=profile_address_id)
+            .exists()
+        ):
+            return Response(
+                {
+                    "message": "You cannot have the same address with the same move in date more than once within one profile"
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+        profile_address.save()
+        return Response({"message": "Successfully updated address in current profile"})
+
+    def delete(self, request: Request, profile_id: int):
+        """
+        Delete an exisitng address on current profile
+        """
+        profile_address_id = request.data.get("profileAddressId")
+        get_object_or_404(TenantProfilesAddresses, pk=profile_address_id).delete()
+        return Response({"message": "Successfully deleted address in current profile"})
