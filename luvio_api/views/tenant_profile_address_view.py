@@ -8,87 +8,23 @@ from luvio_api.common.constants import (
     DOMAIN_API_PAYLOAD_FIELDS,
     TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS,
 )
-from luvio_api.models import Address, StateAndTerritory, Suburb, TenantProfilesAddresses
+from luvio_api.common.domain_api_utils import (
+    get_or_create_address,
+    get_or_create_suburb,
+)
+from luvio_api.models import Address, StateAndTerritory, TenantProfilesAddresses
 from luvio_api.serializers import TenantProfilesAddressesSerializer
 
 
 class TenantProfilesAddressesView(APIView):
-    def post(self, request: Request, profile_id: int):
+    def post(self, request: Request, profile_id: int) -> Response:
         """
         Link a new address to the current profile
         """
-        state = StateAndTerritory.objects.get(
-            state_code=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["state"])
-        )
+        state = self._get_state(request.data)
+        address = self._get_address_from_payload(request.data, state)
 
-        if Suburb.objects.filter(
-            state_and_territory=state,
-            name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
-            postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
-        ).exists():
-            suburb = Suburb.objects.get(
-                state_and_territory=state,
-                name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
-                postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
-            )
-        else:
-            suburb = Suburb.objects.create(
-                state_and_territory=state,
-                name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
-                postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
-            )
-
-        if Address.objects.filter(
-            suburb=suburb,
-            unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
-            street_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_number"]),
-            street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
-            street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
-            street_type_abbrev=request.data.get(
-                DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
-            ),
-        ).exists():
-            address = Address.objects.get(
-                suburb=suburb,
-                unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
-                street_number=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["street_number"]
-                ),
-                street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
-                street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
-                street_type_abbrev=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
-                ),
-            )
-        else:
-            address = Address.objects.create(
-                suburb=suburb,
-                display_address=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["display_address"]
-                ),
-                unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
-                street_number=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["street_number"]
-                ),
-                street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
-                street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
-                street_type_abbrev=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
-                ),
-            )
-        data = {
-            "profile": profile_id,
-            "address": address.id,
-            "move_in_date": request.data.get(
-                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"]
-            ),
-            "move_out_date": request.data.get(
-                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"], None
-            ),
-            "is_current_residence": request.data.get(
-                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"]
-            ),
-        }
+        data = self._construct_new_profile_address(profile_id, address, request.data)
 
         if TenantProfilesAddresses.objects.filter(
             profile=profile_id, address=address, move_in_date=data["move_in_date"]
@@ -108,87 +44,17 @@ class TenantProfilesAddressesView(APIView):
             status=status.HTTP_201_CREATED,
         )
 
-    def put(self, request: Request, profile_id: int):
+    def put(self, request: Request, profile_id: int) -> Response:
         """
         Update exisitng address on current profile
         """
-        state = StateAndTerritory.objects.get(
-            state_code=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["state"])
-        )
+        state = self._get_state(request.data)
+        address = self._get_address_from_payload(request.data, state)
 
-        if Suburb.objects.filter(
-            state_and_territory=state,
-            name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
-            postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
-        ).exists():
-            suburb = Suburb.objects.get(
-                state_and_territory=state,
-                name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
-                postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
-            )
-        else:
-            suburb = Suburb.objects.create(
-                state_and_territory=state,
-                name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["suburb"]),
-                postcode=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["postcode"]),
-            )
-
-        if Address.objects.filter(
-            suburb=suburb,
-            unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
-            street_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_number"]),
-            street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
-            street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
-            street_type_abbrev=request.data.get(
-                DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
-            ),
-        ).exists():
-            address = Address.objects.get(
-                suburb=suburb,
-                unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
-                street_number=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["street_number"]
-                ),
-                street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
-                street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
-                street_type_abbrev=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
-                ),
-            )
-        else:
-            address = Address.objects.create(
-                suburb=suburb,
-                display_address=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["display_address"]
-                ),
-                unit_number=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["unit_number"]),
-                street_number=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["street_number"]
-                ),
-                street_name=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_name"]),
-                street_type=request.data.get(DOMAIN_API_PAYLOAD_FIELDS["street_type"]),
-                street_type_abbrev=request.data.get(
-                    DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
-                ),
-            )
-
-        profile_address_id = request.data.get("profileAddressId")
         profile_address = get_object_or_404(
-            TenantProfilesAddresses, pk=profile_address_id
+            TenantProfilesAddresses, pk=request.data.get("profileAddressId")
         )
-        profile_address.address = address
-        profile_address.move_in_date = request.data.get(
-            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"],
-            profile_address.move_in_date,
-        )
-        profile_address.move_out_date = request.data.get(
-            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"],
-            profile_address.move_out_date,
-        )
-        profile_address.is_current_residence = request.data.get(
-            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"],
-            profile_address.is_current_residence,
-        )
+        self._update_profile_address(profile_address, request.data, address)
 
         if (
             TenantProfilesAddresses.objects.filter(
@@ -196,7 +62,7 @@ class TenantProfilesAddressesView(APIView):
                 address=address,
                 move_in_date=profile_address.move_in_date,
             )
-            .exclude(pk=profile_address_id)
+            .exclude(pk=request.data.get("profileAddressId"))
             .exists()
         ):
             return Response(
@@ -208,10 +74,61 @@ class TenantProfilesAddressesView(APIView):
         profile_address.save()
         return Response({"message": "Successfully updated address in current profile"})
 
-    def delete(self, request: Request, profile_id: int):
+    def delete(self, request: Request, profile_id: int) -> Response:
         """
         Delete an exisitng address on current profile
         """
-        profile_address_id = request.data.get("profileAddressId")
-        get_object_or_404(TenantProfilesAddresses, pk=profile_address_id).delete()
+        get_object_or_404(
+            TenantProfilesAddresses, pk=request.data.get("profileAddressId")
+        ).delete()
         return Response({"message": "Successfully deleted address in current profile"})
+
+    def _get_state(self, payload: dict) -> StateAndTerritory:
+        return StateAndTerritory.objects.get(
+            state_code=payload.get(DOMAIN_API_PAYLOAD_FIELDS["state"])
+        )
+
+    def _get_address_from_payload(
+        self, payload: dict, state: StateAndTerritory
+    ) -> Address:
+        suburb = get_or_create_suburb(payload, state)
+        address = get_or_create_address(
+            payload,
+            suburb,
+            payload.get(DOMAIN_API_PAYLOAD_FIELDS["display_address"]),
+        )
+        return address
+
+    def _construct_new_profile_address(
+        self, profile_id: int, address: Address, payload: dict
+    ):
+        return {
+            "profile": profile_id,
+            "address": address.id,
+            "move_in_date": payload.get(
+                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"]
+            ),
+            "move_out_date": payload.get(
+                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"], None
+            ),
+            "is_current_residence": payload.get(
+                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"]
+            ),
+        }
+
+    def _update_profile_address(
+        self, profile_address: TenantProfilesAddresses, payload: dict, address: Address
+    ):
+        profile_address.address = address
+        profile_address.move_in_date = payload.get(
+            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"],
+            profile_address.move_in_date,
+        )
+        profile_address.move_out_date = payload.get(
+            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"],
+            profile_address.move_out_date,
+        )
+        profile_address.is_current_residence = payload.get(
+            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"],
+            profile_address.is_current_residence,
+        )

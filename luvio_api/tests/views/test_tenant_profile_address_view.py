@@ -253,6 +253,11 @@ class UserProfileTestCase(TestCase):
         ).render()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(
+            TenantProfilesAddresses.objects.filter(
+                pk=self.profileAddressEntry2.id
+            ).exists()
+        )
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+from luvio_api.common.constants import DOMAIN_API_PAYLOAD_FIELDS
 from luvio_api.models import Address, StateAndTerritory, Suburb
 
 
@@ -9,7 +10,9 @@ def store_suburb_and_address_data(addresses: list):
         display_address = address["address"]
         details = address["addressComponents"]
 
-        state = StateAndTerritory.objects.get(state_code=details["state"])
+        state = StateAndTerritory.objects.get(
+            state_code=details[DOMAIN_API_PAYLOAD_FIELDS["state"]]
+        )
         suburb = get_or_create_suburb(details, state)
         get_or_create_address(details, suburb, display_address)
 
@@ -20,18 +23,18 @@ def get_or_create_suburb(address_details: dict, state: StateAndTerritory):
     """
     if Suburb.objects.filter(
         state_and_territory=state,
-        name=address_details["suburb"],
-        postcode=address_details["postCode"],
+        name=address_details[DOMAIN_API_PAYLOAD_FIELDS["suburb"]],
+        postcode=address_details[DOMAIN_API_PAYLOAD_FIELDS["postcode"]],
     ).exists():
         return Suburb.objects.get(
             state_and_territory=state,
-            name=address_details["suburb"],
-            postcode=address_details["postCode"],
+            name=address_details[DOMAIN_API_PAYLOAD_FIELDS["suburb"]],
+            postcode=address_details[DOMAIN_API_PAYLOAD_FIELDS["postcode"]],
         )
     return Suburb.objects.create(
         state_and_territory=state,
-        name=address_details["suburb"],
-        postcode=address_details["postCode"],
+        name=address_details[DOMAIN_API_PAYLOAD_FIELDS["suburb"]],
+        postcode=address_details[DOMAIN_API_PAYLOAD_FIELDS["postcode"]],
     )
 
 
@@ -41,26 +44,32 @@ def get_or_create_address(address_details: dict, suburb: Suburb, display_address
     """
     if Address.objects.filter(
         suburb=suburb,
-        unit_number=address_details["unitNumber"],
-        street_number=address_details["streetNumber"],
-        street_name=address_details["streetName"],
-        street_type=address_details["streetTypeLong"],
-        street_type_abbrev=address_details["streetType"],
+        unit_number=address_details[DOMAIN_API_PAYLOAD_FIELDS["unit_number"]],
+        street_number=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_number"]],
+        street_name=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_name"]],
+        street_type=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_type"]],
+        street_type_abbrev=address_details[
+            DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
+        ],
     ).exists():
         return Address.objects.get(
             suburb=suburb,
-            unit_number=address_details["unitNumber"],
-            street_number=address_details["streetNumber"],
-            street_name=address_details["streetName"],
-            street_type=address_details["streetTypeLong"],
-            street_type_abbrev=address_details["streetType"],
+            unit_number=address_details[DOMAIN_API_PAYLOAD_FIELDS["unit_number"]],
+            street_number=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_number"]],
+            street_name=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_name"]],
+            street_type=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_type"]],
+            street_type_abbrev=address_details[
+                DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
+            ],
         )
     return Address.objects.create(
         suburb=suburb,
         display_address=display_address,
-        unit_number=address_details["unitNumber"],
-        street_number=address_details["streetNumber"],
-        street_name=address_details["streetName"],
-        street_type=address_details["streetTypeLong"],
-        street_type_abbrev=address_details["streetType"],
+        unit_number=address_details[DOMAIN_API_PAYLOAD_FIELDS["unit_number"]],
+        street_number=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_number"]],
+        street_name=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_name"]],
+        street_type=address_details[DOMAIN_API_PAYLOAD_FIELDS["street_type"]],
+        street_type_abbrev=address_details[
+            DOMAIN_API_PAYLOAD_FIELDS["street_type_abbrev"]
+        ],
     )
