@@ -24,7 +24,7 @@ class UserProfileTestCase(TestCase):
         cls.default_user.save()
 
         # Create state
-        cls.vic_state = StateAndTerritory.objects.create(
+        StateAndTerritory.objects.create(
             state_code="VIC", name="Victoria", country="Australia"
         )
 

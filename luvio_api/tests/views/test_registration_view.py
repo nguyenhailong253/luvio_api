@@ -35,7 +35,7 @@ class RegistrationViewTestCase(TestCase):
                 "first_name": "wow",
                 "last_name": "woah",
                 "password": "secret",
-                "date_of_birth": "01/01/2022",
+                "date_of_birth": "2022-01-01",
                 "is_active": True,
             },
         ).render()
@@ -58,7 +58,7 @@ class RegistrationViewTestCase(TestCase):
                 "first_name": "wow",
                 "last_name": "woah",
                 "password": "secret",
-                "date_of_birth": "01/01/2022",
+                "date_of_birth": "2022-01-01",
                 "is_active": True,
             },
         ).render()

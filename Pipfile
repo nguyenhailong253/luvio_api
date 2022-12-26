@@ -9,12 +9,14 @@ djangorestframework = "*"
 psycopg2-binary = "*"
 django-environ = "*"
 bcrypt = "*"
+requests = "*"
 
 [dev-packages]
 pylint = "*"
 pylint-django = "*"
 black = "*"
 isort = "*"
+wrapt = "*"
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"

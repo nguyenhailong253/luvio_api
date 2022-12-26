@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 from luvio_api.common.constants import TEXT_FIELD_MAX_LENGTH
@@ -18,6 +20,7 @@ class UserProfile(models.Model):
     profile_url = models.CharField(
         max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True
     )
+    date_created = models.DateField(default=datetime.today().strftime("%Y-%m-%d"))
 
     def __str__(self):
         return self.profile_url

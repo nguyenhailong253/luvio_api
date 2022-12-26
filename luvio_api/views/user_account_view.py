@@ -1,4 +1,4 @@
-from django.shortcuts import get_list_or_404, get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import exceptions, status
 from rest_framework.decorators import api_view
 from rest_framework.request import Request
@@ -6,19 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from luvio_api.models import UserAccount
-from luvio_api.serializers import UserAccountSerializer
 
 
 class UserAccountView(APIView):
-    def get(self, request: Request):
-        """
-        Currently get all existing accounts for testing only
-        TODO: Change to get single account
-        """
-        accounts = get_list_or_404(UserAccount)
-        serializer = UserAccountSerializer(accounts, many=True)
-        return Response(serializer.data)
-
     def put(self, request: Request):
         """
         Update an existing account's details (excluding password)
