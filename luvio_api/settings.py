@@ -53,7 +53,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     # Ref: https://docs.djangoproject.com/en/3.2/ref/settings/#date-input-formats
-    "DATE_INPUT_FORMATS": ["%d/%m/%Y"],
+    "DATE_INPUT_FORMATS": ["%Y-%m-%d"],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
 

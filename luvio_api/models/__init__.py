@@ -7,3 +7,4 @@ from .user_profile import UserProfile
 from .addresses import (
     Address,
 )  # need to be imported after Suburb, otherwise circular import error
+from .tenant_profiles_addresses import TenantProfilesAddresses
