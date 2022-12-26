@@ -56,18 +56,12 @@ class DomainApiUtilsTestCase(TestCase):
         ]
         store_suburb_and_address_data(addresses)
 
-        self.assertFalse(
-            Address.objects.filter(
-                display_address="900/456 Mary Road, New Suburb VIC 1100"
-            ).exists()
-        )
         self.assertTrue(
             Address.objects.filter(
                 display_address="1/123 John Street, Fake Suburb VIC 1000"
             ).exists()
         )
         self.assertTrue(Suburb.objects.filter(name="Fake Suburb").exists())
-        self.assertFalse(Suburb.objects.filter(name="New Suburb").exists())
 
     def test_store_suburb_and_address_data_where_data_not_exist(self):
         """
