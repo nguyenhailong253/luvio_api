@@ -12,7 +12,8 @@ from luvio_api.serializers import UserAccountSerializer
 class UserAccountView(APIView):
     def get(self, request: Request):
         """
-        Get all existing accounts - for testing only
+        Currently get all existing accounts for testing only
+        TODO: Change to get single account
         """
         accounts = get_list_or_404(UserAccount)
         serializer = UserAccountSerializer(accounts, many=True)
