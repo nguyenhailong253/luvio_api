@@ -18,13 +18,11 @@ class DomainApiClient:
     def __init__(self):
         # When calling Domain API, if receive 401, meaning token might have expired, try refresh token and then re call
         self.access_token = self._get_access_token()
-        print(f"token: {self.access_token}")
 
     def _get_access_token(self):
         try:
             return env("DOMAIN_API_TOKEN")
         except Exception:
-            print("NOT HERE")
             return self._refresh_token()
 
     def _refresh_token(self):
@@ -55,6 +53,8 @@ class DomainApiClient:
                 self._refresh_token()
                 headers = {"Authorization": f"Bearer {self.access_token}"}
                 response = requests.get(url, headers=headers, timeout=TIMEOUT)
+            else:
+                raise e
         return response.json()
 
     def get_address_suggestions(self, search_term_url_encoded: str):
