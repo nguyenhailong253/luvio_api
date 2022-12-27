@@ -6,41 +6,43 @@ from rest_framework.views import APIView
 
 from luvio_api.common.check_profile_type import check_profile_type
 from luvio_api.common.constants import (
+    AGENT_PROFILES_ADDRESSES_FIELD_MAPPINGS,
     DOMAIN_API_PAYLOAD_FIELDS,
     PROFILE_ADDRESS_ID,
     PROFILE_TYPES,
-    TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS,
 )
 from luvio_api.common.domain_api_utils import (
     get_or_create_address,
     get_or_create_suburb,
 )
-from luvio_api.models import Address, StateAndTerritory, TenantProfilesAddresses
-from luvio_api.serializers import TenantProfilesAddressesSerializer
+from luvio_api.models import Address, AgentProfilesAddresses, StateAndTerritory
+from luvio_api.serializers import AgentProfilesAddressesSerializer
 
 
-class TenantProfilesAddressesView(APIView):
+class AgentProfilesAddressesView(APIView):
     def post(self, request: Request, profile_id: int) -> Response:
         """
         Link a new address to the current profile
         """
-        check_profile_type(profile_id, PROFILE_TYPES["tenant"])
+        check_profile_type(profile_id, PROFILE_TYPES["agent"])
         state = self._get_state(request.data)
         address = self._get_address_from_payload(request.data, state)
 
         data = self._construct_new_profile_address(profile_id, address, request.data)
 
-        if TenantProfilesAddresses.objects.filter(
-            profile=profile_id, address=address, move_in_date=data["move_in_date"]
+        if AgentProfilesAddresses.objects.filter(
+            profile=profile_id,
+            address=address,
+            management_start_date=data["management_start_date"],
         ).exists():
             return Response(
                 {
-                    "message": "You cannot have the same address with the same move in date more than once within one profile"
+                    "message": "You cannot have the same address with the same management start date more than once within one profile"
                 },
                 status=status.HTTP_409_CONFLICT,
             )
 
-        serializer = TenantProfilesAddressesSerializer(data=data)
+        serializer = AgentProfilesAddressesSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(
@@ -52,27 +54,27 @@ class TenantProfilesAddressesView(APIView):
         """
         Update exisitng address on current profile
         """
-        check_profile_type(profile_id, PROFILE_TYPES["tenant"])
+        check_profile_type(profile_id, PROFILE_TYPES["agent"])
         state = self._get_state(request.data)
         address = self._get_address_from_payload(request.data, state)
 
         profile_address = get_object_or_404(
-            TenantProfilesAddresses, pk=request.data.get(PROFILE_ADDRESS_ID)
+            AgentProfilesAddresses, pk=request.data.get(PROFILE_ADDRESS_ID)
         )
         self._update_profile_address(profile_address, request.data, address)
 
         if (
-            TenantProfilesAddresses.objects.filter(
+            AgentProfilesAddresses.objects.filter(
                 profile=profile_id,
                 address=address,
-                move_in_date=profile_address.move_in_date,
+                management_start_date=profile_address.management_start_date,
             )
             .exclude(pk=request.data.get(PROFILE_ADDRESS_ID))
             .exists()
         ):
             return Response(
                 {
-                    "message": "You cannot have the same address with the same move in date more than once within one profile"
+                    "message": "You cannot have the same address with the same management start date more than once within one profile"
                 },
                 status=status.HTTP_409_CONFLICT,
             )
@@ -83,9 +85,9 @@ class TenantProfilesAddressesView(APIView):
         """
         Delete an exisitng address on current profile
         """
-        check_profile_type(profile_id, PROFILE_TYPES["tenant"])
+        check_profile_type(profile_id, PROFILE_TYPES["agent"])
         get_object_or_404(
-            TenantProfilesAddresses, pk=request.data.get(PROFILE_ADDRESS_ID)
+            AgentProfilesAddresses, pk=request.data.get(PROFILE_ADDRESS_ID)
         ).delete()
         return Response({"message": "Successfully deleted address in current profile"})
 
@@ -111,30 +113,23 @@ class TenantProfilesAddressesView(APIView):
         return {
             "profile": profile_id,
             "address": address.id,
-            "move_in_date": payload[
-                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"]
+            "management_start_date": payload[
+                AGENT_PROFILES_ADDRESSES_FIELD_MAPPINGS["management_start_date"]
             ],
-            "move_out_date": payload.get(
-                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"], None
+            "management_end_date": payload.get(
+                AGENT_PROFILES_ADDRESSES_FIELD_MAPPINGS["management_end_date"], None
             ),
-            "is_current_residence": payload[
-                TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"]
-            ],
         }
 
     def _update_profile_address(
-        self, profile_address: TenantProfilesAddresses, payload: dict, address: Address
+        self, profile_address: AgentProfilesAddresses, payload: dict, address: Address
     ):
         profile_address.address = address
-        profile_address.move_in_date = payload.get(
-            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"],
-            profile_address.move_in_date,
+        profile_address.management_start_date = payload.get(
+            AGENT_PROFILES_ADDRESSES_FIELD_MAPPINGS["management_start_date"],
+            profile_address.management_start_date,
         )
-        profile_address.move_out_date = payload.get(
-            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"],
-            profile_address.move_out_date,
-        )
-        profile_address.is_current_residence = payload.get(
-            TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"],
-            profile_address.is_current_residence,
+        profile_address.management_end_date = payload.get(
+            AGENT_PROFILES_ADDRESSES_FIELD_MAPPINGS["management_end_date"],
+            profile_address.management_end_date,
         )
