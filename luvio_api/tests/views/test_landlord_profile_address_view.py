@@ -7,16 +7,16 @@ from rest_framework.test import APIClient
 from luvio_api.common.constants import PROFILE_ADDRESS_ID, PROFILE_TYPES
 from luvio_api.models import (
     Address,
+    LandlordProfilesAddresses,
     ProfileType,
     StateAndTerritory,
     Suburb,
-    TenantProfilesAddresses,
     UserAccount,
     UserProfile,
 )
 
 
-class TenantProfilesAddressesTestCase(TestCase):
+class LandlordProfilesAddressesTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Main default user for testing
@@ -32,15 +32,15 @@ class TenantProfilesAddressesTestCase(TestCase):
         cls.default_user.save()
 
         # Set up profile types
-        cls.tenant_profile_type = ProfileType.objects.create(
-            profile_type=PROFILE_TYPES["tenant"]
+        cls.landlord_profile_type = ProfileType.objects.create(
+            profile_type=PROFILE_TYPES["landlord"]
         )
 
-        # Create a tenant profile
-        cls.tenant_profile = UserProfile.objects.create(
+        # Create a landlord profile
+        cls.landlord_profile = UserProfile.objects.create(
             avatar_link="https://img.com",
-            profile_pitch="Hi I'm a well known tenant",
-            profile_type=cls.tenant_profile_type,
+            profile_pitch="Hi I'm a well known landlord",
+            profile_type=cls.landlord_profile_type,
             profile_url="",
             account=cls.default_user,
         )
@@ -81,18 +81,18 @@ class TenantProfilesAddressesTestCase(TestCase):
         )
 
         # Create address already linked to profile
-        cls.profileAddressEntry1 = TenantProfilesAddresses.objects.create(
-            profile=cls.tenant_profile,
+        cls.profileAddressEntry1 = LandlordProfilesAddresses.objects.create(
+            profile=cls.landlord_profile,
             address=cls.address1,
-            move_in_date="2022-12-31",
-            move_out_date=None,
+            ownership_start_date="2022-12-31",
+            ownership_end_date=None,
             is_current_residence=True,
         )
-        cls.profileAddressEntry2 = TenantProfilesAddresses.objects.create(
-            profile=cls.tenant_profile,
+        cls.profileAddressEntry2 = LandlordProfilesAddresses.objects.create(
+            profile=cls.landlord_profile,
             address=cls.address2,
-            move_in_date="2025-01-01",
-            move_out_date="2026-01-01",
+            ownership_start_date="2025-01-01",
+            ownership_end_date="2026-01-01",
             is_current_residence=False,
         )
 
@@ -105,7 +105,7 @@ class TenantProfilesAddressesTestCase(TestCase):
         Test successfully link an address to current profile
         """
         response = self.client.post(
-            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/landlord-profiles/{self.landlord_profile.id}/addresses/",
             {
                 "address": "1/123 John Street, Fake Suburb VIC 1000",
                 "unitNumber": "1",
@@ -116,8 +116,8 @@ class TenantProfilesAddressesTestCase(TestCase):
                 "suburb": "Fake Suburb",
                 "postCode": "1000",
                 "state": "VIC",
-                "moveInDate": "2023-01-01",
-                "moveOutDate": "2024-01-01",
+                "ownershipStartDate": "2023-01-01",
+                "ownershipEndDate": "2024-01-01",
                 "isCurrentResidence": False,
             },
         ).render()
@@ -128,17 +128,17 @@ class TenantProfilesAddressesTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data[PROFILE_ADDRESS_ID])
         self.assertTrue(
-            TenantProfilesAddresses.objects.filter(
-                profile=self.tenant_profile.id, address=address
+            LandlordProfilesAddresses.objects.filter(
+                profile=self.landlord_profile.id, address=address
             ).exists()
         )
 
-    def test_link_address_to_profile_when_move_out_date_is_none(self):
+    def test_link_address_to_profile_when_ownership_end_date_is_none(self):
         """
-        Test successfully link an address to current profile even when move_out_date is none
+        Test successfully link an address to current profile even when ownership_end_date is none
         """
         response = self.client.post(
-            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/landlord-profiles/{self.landlord_profile.id}/addresses/",
             {
                 "address": "2/345 Mary Road, New Suburb VIC 1100",
                 "unitNumber": "2",
@@ -149,8 +149,8 @@ class TenantProfilesAddressesTestCase(TestCase):
                 "suburb": "New Suburb",
                 "postCode": "1100",
                 "state": "VIC",
-                "moveInDate": "2022-12-31",
-                "moveOutDate": None,
+                "ownershipStartDate": "2022-12-31",
+                "ownershipEndDate": None,
                 "isCurrentResidence": True,
             },
         ).render()
@@ -161,17 +161,17 @@ class TenantProfilesAddressesTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertTrue(response.data[PROFILE_ADDRESS_ID])
         self.assertTrue(
-            TenantProfilesAddresses.objects.filter(
-                profile=self.tenant_profile.id, address=address
+            LandlordProfilesAddresses.objects.filter(
+                profile=self.landlord_profile.id, address=address
             ).exists()
         )
 
-    def test_link_address_to_profile_when_same_address_and_move_in_date(self):
+    def test_link_address_to_profile_when_same_address_and_ownership_start_date(self):
         """
-        Test unable to link an address to current profile if same address and move_in_date with other entries
+        Test unable to link an address to current profile if same address and ownership_start_date with other entries
         """
         response = self.client.post(
-            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/landlord-profiles/{self.landlord_profile.id}/addresses/",
             {
                 "address": "789 Brian Boulevard, New Suburb VIC 1100",
                 "unitNumber": None,
@@ -182,8 +182,8 @@ class TenantProfilesAddressesTestCase(TestCase):
                 "suburb": "New Suburb",
                 "postCode": "1100",
                 "state": "VIC",
-                "moveInDate": "2022-12-31",
-                "moveOutDate": None,
+                "ownershipStartDate": "2022-12-31",
+                "ownershipEndDate": None,
                 "isCurrentResidence": True,
             },
         ).render()
@@ -195,7 +195,7 @@ class TenantProfilesAddressesTestCase(TestCase):
         Test successfully update address in current profile
         """
         response = self.client.put(
-            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/landlord-profiles/{self.landlord_profile.id}/addresses/",
             {
                 "profileAddressId": self.profileAddressEntry1.id,
                 "address": "789 Brian Boulevard, New Suburb VIC 1100",
@@ -207,26 +207,26 @@ class TenantProfilesAddressesTestCase(TestCase):
                 "suburb": "New Suburb",
                 "postCode": "1100",
                 "state": "VIC",
-                "moveInDate": "2022-12-31",
-                "moveOutDate": "2023-12-31",
+                "ownershipStartDate": "2022-12-31",
+                "ownershipEndDate": "2023-12-31",
                 "isCurrentResidence": True,
             },
         ).render()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            TenantProfilesAddresses.objects.get(
+            LandlordProfilesAddresses.objects.get(
                 pk=self.profileAddressEntry1.id
-            ).move_out_date.strftime("%Y-%m-%d"),
+            ).ownership_end_date.strftime("%Y-%m-%d"),
             "2023-12-31",
         )
 
-    def test_update_address_in_profile_when_same_address_and_move_in_date(self):
+    def test_update_address_in_profile_when_same_address_and_ownership_start_date(self):
         """
         Test unable to update address in current profile when other entries have the same address and move in date
         """
         response = self.client.put(
-            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/landlord-profiles/{self.landlord_profile.id}/addresses/",
             {
                 "profileAddressId": self.profileAddressEntry2.id,
                 "address": "789 Brian Boulevard, New Suburb VIC 1100",
@@ -238,8 +238,8 @@ class TenantProfilesAddressesTestCase(TestCase):
                 "suburb": "New Suburb",
                 "postCode": "1100",
                 "state": "VIC",
-                "moveInDate": "2022-12-31",
-                "moveOutDate": "2023-12-31",
+                "ownershipStartDate": "2022-12-31",
+                "ownershipEndDate": "2023-12-31",
                 "isCurrentResidence": True,
             },
         ).render()
@@ -251,7 +251,7 @@ class TenantProfilesAddressesTestCase(TestCase):
         Test delete address in current profile
         """
         response = self.client.delete(
-            f"/profiles/tenant-profiles/{self.tenant_profile.id}/addresses/",
+            f"/profiles/landlord-profiles/{self.landlord_profile.id}/addresses/",
             {
                 "profileAddressId": self.profileAddressEntry2.id,
             },
@@ -259,7 +259,7 @@ class TenantProfilesAddressesTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(
-            TenantProfilesAddresses.objects.filter(
+            LandlordProfilesAddresses.objects.filter(
                 pk=self.profileAddressEntry2.id
             ).exists()
         )

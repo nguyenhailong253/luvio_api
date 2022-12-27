@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from luvio_api.common.constants import PROFILE_TYPES
+from luvio_api.common.constants import PROFILE_ADDRESS_ID, PROFILE_TYPES
 from luvio_api.models import (
     Address,
     AgentProfilesAddresses,
@@ -123,6 +123,7 @@ class AgentProfilesAddressesTestCase(TestCase):
             display_address="1/123 John Street, Fake Suburb VIC 1000"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(response.data[PROFILE_ADDRESS_ID])
         self.assertTrue(
             AgentProfilesAddresses.objects.filter(
                 profile=self.agent_profile.id, address=address
@@ -154,6 +155,7 @@ class AgentProfilesAddressesTestCase(TestCase):
             display_address="2/345 Mary Road, New Suburb VIC 1100"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(response.data[PROFILE_ADDRESS_ID])
         self.assertTrue(
             AgentProfilesAddresses.objects.filter(
                 profile=self.agent_profile.id, address=address
