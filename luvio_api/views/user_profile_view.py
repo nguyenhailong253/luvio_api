@@ -9,7 +9,7 @@ from luvio_api.serializers import UserProfileSerializer
 
 
 class UserProfileListView(APIView):
-    def get(self, request: Request):
+    def get(self, request: Request) -> Response:
         """
         Get existing profiles of the logged in account
         """
@@ -19,7 +19,7 @@ class UserProfileListView(APIView):
         serializer = UserProfileSerializer(profiles, many=True)
         return Response(serializer.data)
 
-    def post(self, request: Request):
+    def post(self, request: Request) -> Response:
         """
         Create a new profile for the logged in account
         """
@@ -59,7 +59,7 @@ class UserProfileListView(APIView):
 
 
 class UserProfileDetailView(APIView):
-    def get(self, request: Request, id: int):
+    def get(self, request: Request, id: int) -> Response:
         """
         Get existing profile of the logged in account based on profile id
         """
@@ -68,7 +68,7 @@ class UserProfileDetailView(APIView):
         serializer = UserProfileSerializer(profile)
         return Response(serializer.data)
 
-    def put(self, request: Request, id: int):
+    def put(self, request: Request, id: int) -> Response:
         """
         Update an existing profile
         """
@@ -82,7 +82,7 @@ class UserProfileDetailView(APIView):
             }
         )
 
-    def delete(self, request: Request, id: int):
+    def delete(self, request: Request, id: int) -> Response:
         """
         Delete an existing profile
         """
@@ -93,5 +93,5 @@ class UserProfileDetailView(APIView):
             }
         )
 
-    def _get_profile(self, id: int, account: UserAccount):
+    def _get_profile(self, id: int, account: UserAccount) -> UserProfile:
         return get_object_or_404(UserProfile, pk=id, account=account)

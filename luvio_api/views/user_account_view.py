@@ -9,7 +9,7 @@ from luvio_api.models import UserAccount
 
 
 class UserAccountView(APIView):
-    def put(self, request: Request):
+    def put(self, request: Request) -> Response:
         """
         Update an existing account's details (excluding password)
         """
@@ -32,7 +32,7 @@ class UserAccountView(APIView):
 
 # Ref: https://stackoverflow.com/a/33389526/8749888
 @api_view(["PUT"])
-def change_password(request: Request):
+def change_password(request: Request) -> Response:
     current_account = request.user
     if current_account.check_password(request.data.get("old_password", None)):
         new_password = request.data.get("new_password", None)

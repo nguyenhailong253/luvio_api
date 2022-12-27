@@ -8,5 +8,5 @@ class TenantProfilesAddressesSerializer(serializers.ModelSerializer):
         model = TenantProfilesAddresses
         fields = "__all__"
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> TenantProfilesAddresses:
         return TenantProfilesAddresses.objects.create(**validated_data)

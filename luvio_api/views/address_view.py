@@ -8,7 +8,7 @@ from luvio_api.integrations import DomainApiClient
 
 
 @api_view(["GET"])
-def get_address_suggestions(request: Request):
+def get_address_suggestions(request: Request) -> Response:
     # query param for search term should already be urlencoded from the front end
     search_term = request.query_params.get("term", None)
     if search_term:

@@ -1,3 +1,5 @@
+from typing import Any, Iterable
+
 import environ
 import requests
 from requests.auth import HTTPBasicAuth
@@ -19,13 +21,13 @@ class DomainApiClient:
         # When calling Domain API, if receive 401, meaning token might have expired, try refresh token and then re call
         self.access_token = self._get_access_token()
 
-    def _get_access_token(self):
+    def _get_access_token(self) -> str:
         try:
             return env("DOMAIN_API_TOKEN")
         except Exception:
             return self._refresh_token()
 
-    def _refresh_token(self):
+    def _refresh_token(self) -> str:
         client_id = env("DOMAIN_API_CLIENT_ID")
         client_secrets = env("DOMAIN_API_CLIENT_SECRET")
         req_body = {
@@ -42,7 +44,7 @@ class DomainApiClient:
         response.raise_for_status()
         return response.json()["access_token"]
 
-    def _get(self, url: str):
+    def _get(self, url: str) -> Iterable[Any]:
         headers = {"Authorization": f"Bearer {self.access_token}"}
         try:
             response = requests.get(url, headers=headers, timeout=TIMEOUT)
@@ -57,6 +59,6 @@ class DomainApiClient:
                 raise e
         return response.json()
 
-    def get_address_suggestions(self, search_term_url_encoded: str):
+    def get_address_suggestions(self, search_term_url_encoded: str) -> Iterable[Any]:
         url = f"{DOMAIN_API_PROPERTIES_URL}/_suggest?terms={search_term_url_encoded}&channel=All"
         return self._get(url)

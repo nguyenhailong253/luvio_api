@@ -12,7 +12,7 @@ from luvio_api.models import UserAccount
 class LoginView(ObtainAuthToken):
     permission_classes = [AllowAny]
 
-    def post(self, request: Request, *args, **kwargs):
+    def post(self, request: Request, *args, **kwargs) -> Response:
         payload = request.data
         password = payload.get("password", None)
         username = self._get_username(payload)

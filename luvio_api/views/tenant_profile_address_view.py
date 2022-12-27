@@ -85,7 +85,7 @@ class TenantProfilesAddressesView(APIView):
 
     def _get_state(self, payload: dict) -> StateAndTerritory:
         return StateAndTerritory.objects.get(
-            state_code=payload.get(DOMAIN_API_PAYLOAD_FIELDS["state"])
+            state_code=payload[DOMAIN_API_PAYLOAD_FIELDS["state"]]
         )
 
     def _get_address_from_payload(
@@ -95,7 +95,7 @@ class TenantProfilesAddressesView(APIView):
         address = get_or_create_address(
             payload,
             suburb,
-            payload.get(DOMAIN_API_PAYLOAD_FIELDS["display_address"]),
+            payload[DOMAIN_API_PAYLOAD_FIELDS["display_address"]],
         )
         return address
 
@@ -105,15 +105,15 @@ class TenantProfilesAddressesView(APIView):
         return {
             "profile": profile_id,
             "address": address.id,
-            "move_in_date": payload.get(
+            "move_in_date": payload[
                 TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"]
-            ),
+            ],
             "move_out_date": payload.get(
                 TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"], None
             ),
-            "is_current_residence": payload.get(
+            "is_current_residence": payload[
                 TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"]
-            ),
+            ],
         }
 
     def _update_profile_address(

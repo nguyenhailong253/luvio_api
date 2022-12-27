@@ -14,3 +14,4 @@ format:
 
 lint:
 	pipenv run pylint ./luvio_api --fail-under=9
+	pipenv run mypy luvio_api/

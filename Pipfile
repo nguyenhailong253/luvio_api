@@ -17,6 +17,8 @@ pylint-django = "*"
 black = "*"
 isort = "*"
 wrapt = "*"
+mypy = "*"
+types-requests = "*"
 
 [requires]
 python_version = "3.11"
