@@ -8,7 +8,7 @@ class UserAccountSerializer(serializers.ModelSerializer):
         model = UserAccount
         fields = "__all__"
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> UserAccount:
         # Ref: https://stackoverflow.com/a/63976118/8749888
         raw_password = validated_data.pop("password")
         user = super().create(validated_data)

@@ -1,8 +1,10 @@
+from typing import Any, Iterable
+
 from luvio_api.common.constants import DOMAIN_API_PAYLOAD_FIELDS
 from luvio_api.models import Address, StateAndTerritory, Suburb
 
 
-def store_suburb_and_address_data(addresses: list):
+def store_suburb_and_address_data(addresses: Iterable[Any]):
     """
     Store all addresses data retrieved from Domain API to our own DB
     """
@@ -17,7 +19,7 @@ def store_suburb_and_address_data(addresses: list):
         get_or_create_address(details, suburb, display_address)
 
 
-def get_or_create_suburb(address_details: dict, state: StateAndTerritory):
+def get_or_create_suburb(address_details: dict, state: StateAndTerritory) -> Suburb:
     """
     Check if suburb data for an address already exists, if not create new entry in our DB
     """
@@ -38,7 +40,9 @@ def get_or_create_suburb(address_details: dict, state: StateAndTerritory):
     )
 
 
-def get_or_create_address(address_details: dict, suburb: Suburb, display_address: str):
+def get_or_create_address(
+    address_details: dict, suburb: Suburb, display_address: str
+) -> Address:
     """
     Check if address data already exists, if not create new entry in our DB
     """

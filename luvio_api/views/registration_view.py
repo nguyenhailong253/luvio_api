@@ -11,7 +11,7 @@ from luvio_api.serializers import UserAccountSerializer
 class RegistrationView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self, request: Request):
+    def post(self, request: Request) -> Response:
         """
         Register a new user account and return auth token
         """
