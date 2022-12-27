@@ -42,9 +42,12 @@ class TenantProfilesAddressesView(APIView):
 
         serializer = TenantProfilesAddressesSerializer(data=data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        record = serializer.save()
         return Response(
-            {"message": "Successfully linked address to current profile"},
+            {
+                "message": "Successfully linked address to current profile",
+                PROFILE_ADDRESS_ID: record.id,
+            },
             status=status.HTTP_201_CREATED,
         )
 
