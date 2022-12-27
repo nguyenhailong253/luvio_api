@@ -30,6 +30,12 @@ AGENT_PROFILES_ADDRESSES_FIELD_MAPPINGS = {
     "management_end_date": "managementEndDate",
 }
 
+LANDLORD_PROFILES_ADDRESSES_FIELD_MAPPINGS = {
+    "ownership_start_date": "ownershipStartDate",
+    "ownership_end_date": "ownershipEndDate",
+    "is_current_residence": "isCurrentResidence",
+}
+
 PROFILE_ADDRESS_ID = "profileAddressId"
 
 PROFILE_TYPES = {

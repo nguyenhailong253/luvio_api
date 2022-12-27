@@ -42,6 +42,11 @@ urlpatterns = [
         views.AgentProfilesAddressesView.as_view(),
         name="agent-profiles-addresses",
     ),
+    path(
+        "profiles/landlord-profiles/<int:profile_id>/addresses/",
+        views.LandlordProfilesAddressesView.as_view(),
+        name="landlord-profiles-addresses",
+    ),
     path("profile-types/", views.ProfileTypeView.as_view(), name="profile-types"),
     path(
         "addresses/suggestions/",
