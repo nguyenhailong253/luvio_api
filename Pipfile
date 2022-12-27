@@ -19,6 +19,7 @@ isort = "*"
 wrapt = "*"
 mypy = "*"
 types-requests = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.11"
