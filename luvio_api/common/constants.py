@@ -24,3 +24,16 @@ TENANT_PROFILES_ADDRESSES_FIELD_MAPPINGS = {
     "move_out_date": "moveOutDate",
     "is_current_residence": "isCurrentResidence",
 }
+
+AGENT_PROFILES_ADDRESSES_FIELD_MAPPINGS = {
+    "management_start_date": "managementStartDate",
+    "management_end_date": "managementEndDate",
+}
+
+PROFILE_ADDRESS_ID = "profileAddressId"
+
+PROFILE_TYPES = {
+    "tenant": "tenant",
+    "agent": "agent",
+    "landlord": "landlord",
+}

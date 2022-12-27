@@ -2,3 +2,4 @@ from .profile_type_serializer import ProfileTypeSerializer
 from .user_account_serializer import UserAccountSerializer
 from .user_profile_serializer import UserProfileSerializer
 from .tenant_profiles_addresses_serializer import TenantProfilesAddressesSerializer
+from .agent_profiles_addresses_serializer import AgentProfilesAddressesSerializer
