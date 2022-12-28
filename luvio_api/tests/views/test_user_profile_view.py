@@ -32,7 +32,7 @@ class UserProfileTestCase(TestCase):
             avatar_link="https://img.com",
             profile_pitch="Hi I'm a well known agent",
             profile_type=cls.agent_profile_type,
-            profile_url="",
+            profile_url="testurl",
             account=cls.default_user,
         )
 
@@ -59,7 +59,7 @@ class UserProfileTestCase(TestCase):
                 "avatar_link": "img.com",
                 "profile_pitch": "This is a tenant profile",
                 "profile_type": self.landlord_profile_type.id,
-                "profile_url": "",
+                "profile_url": "url",
             },
         ).render()
 
@@ -76,7 +76,7 @@ class UserProfileTestCase(TestCase):
                 "avatar_link": "https://img.com",
                 "profile_pitch": "This is a duplicated profile",
                 "profile_type": self.agent_profile_type.id,
-                "profile_url": "",
+                "profile_url": "testurl",
             },
         ).render()
 

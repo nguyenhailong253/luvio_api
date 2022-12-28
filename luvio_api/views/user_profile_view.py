@@ -4,20 +4,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from luvio_api.models import (
-    UserAccount,
-    UserProfile,
-    ProfileType,
-    TenantProfilesAddresses,
-    LandlordProfilesAddresses,
-    AgentProfilesAddresses,
-    Address,
-)
-from luvio_api.serializers import (
-    UserProfileSerializer,
-    AddressSerializer,
-    LandlordProfilesAddressesSerializer,
-)
+from luvio_api.models import ProfileType, UserAccount, UserProfile
+from luvio_api.serializers import UserProfileSerializer
 
 
 class UserProfileListView(APIView):
@@ -87,28 +75,8 @@ class UserProfileDetailView(APIView):
         Get existing profile of the logged in account based on profile id
         """
         profile = self._get_profile(id, request.user)
-        profile_id = profile.id
-        profile_type_id = profile.profile_type
-        print(f"type id: {profile_type_id}, id: {profile_id}")
         serializer = UserProfileSerializer(profile)
-        linked_addresses = get_list_or_404(
-            LandlordProfilesAddresses, profile=profile_id
-        )
-        print(f"length: {len(linked_addresses)}")
-        addresses = [
-            {
-                "ownership_start_date": linked_address["ownership_start_date"],
-                "ownership_end_date": linked_address["ownership_end_date"],
-                "is_current_residence": linked_address["is_current_residence"],
-                **AddressSerializer(
-                    Address.objects.get(pk=linked_address["address"])
-                ).data,
-            }
-            for linked_address in LandlordProfilesAddressesSerializer(
-                linked_addresses, many=True
-            ).data
-        ]
-        return Response({**serializer.data, "addresses": addresses})
+        return Response(serializer.data)
 
     def put(self, request: Request, id: int) -> Response:
         """

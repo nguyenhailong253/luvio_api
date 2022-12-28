@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from luvio_api.models import UserProfile, ProfileType
+from luvio_api.models import UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

@@ -15,7 +15,7 @@ from luvio_api.common.domain_api_utils import (
     get_or_create_address,
     get_or_create_suburb,
 )
-from luvio_api.models import Address, StateAndTerritory, ProfilesAddresses
+from luvio_api.models import Address, ProfilesAddresses, StateAndTerritory
 from luvio_api.serializers import ProfilesAddressesSerializer
 
 
@@ -114,9 +114,7 @@ class ProfilesAddressesView(APIView):
         return {
             "profile": profile_id,
             "address": address.id,
-            "move_in_date": payload[
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"]
-            ],
+            "move_in_date": payload[PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"]],
             "move_out_date": payload.get(
                 PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"], None
             ),

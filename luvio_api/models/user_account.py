@@ -31,8 +31,10 @@ class UserAccount(AbstractUser):
     password = models.CharField(max_length=PASSWORD_MAX_LENGTH)
     first_name = models.CharField(max_length=NAME_FIELD_MAX_LENGTH)
     last_name = models.CharField(max_length=NAME_FIELD_MAX_LENGTH)
-    date_of_birth = models.DateField(null=True, blank=True)
-    mobile = models.CharField(max_length=AU_MOBILE_MAX_LENGTH, null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True, default=None)
+    mobile = models.CharField(
+        max_length=AU_MOBILE_MAX_LENGTH, null=True, blank=True, default=None
+    )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
