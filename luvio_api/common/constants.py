@@ -36,6 +36,16 @@ LANDLORD_PROFILES_ADDRESSES_FIELD_MAPPINGS = {
     "is_current_residence": "isCurrentResidence",
 }
 
+PROFILES_ADDRESSES_FIELD_MAPPINGS = {
+    "move_in_date": "moveInDate",
+    "move_out_date": "moveOutDate",
+    "management_start_date": "managementStartDate",
+    "management_end_date": "managementEndDate",
+    "ownership_start_date": "ownershipStartDate",
+    "ownership_end_date": "ownershipEndDate",
+    "is_current_residence": "isCurrentResidence",
+}
+
 PROFILE_ADDRESS_ID = "profileAddressId"
 
 PROFILE_TYPES = {

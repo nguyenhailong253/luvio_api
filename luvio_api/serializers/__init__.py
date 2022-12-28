@@ -4,3 +4,5 @@ from .user_profile_serializer import UserProfileSerializer
 from .tenant_profiles_addresses_serializer import TenantProfilesAddressesSerializer
 from .agent_profiles_addresses_serializer import AgentProfilesAddressesSerializer
 from .landlord_profiles_addresses_serializer import LandlordProfilesAddressesSerializer
+from .address_serializer import AddressSerializer
+from .profiles_addresses_serializer import ProfilesAddressesSerializer

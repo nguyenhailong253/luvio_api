@@ -3,7 +3,7 @@ from datetime import datetime
 from django.db import models
 
 from luvio_api.common.constants import TEXT_FIELD_MAX_LENGTH
-from luvio_api.models import ProfileType, UserAccount
+from luvio_api.models import ProfileType, UserAccount, Address
 
 
 class UserProfile(models.Model):
@@ -18,9 +18,16 @@ class UserProfile(models.Model):
         max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True
     )
     profile_url = models.CharField(
-        max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True
+        max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True, unique=True
     )
+    # Could have used models.DateField(auto_now_add=True) ref: https://stackoverflow.com/a/51389274/8749888
     date_created = models.DateField(default=datetime.today().strftime("%Y-%m-%d"))
+    addresses = models.ManyToManyField(
+        Address,
+        through="ProfilesAddresses",
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.profile_url

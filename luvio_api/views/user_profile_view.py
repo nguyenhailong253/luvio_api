@@ -4,8 +4,20 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from luvio_api.models import UserAccount, UserProfile
-from luvio_api.serializers import UserProfileSerializer
+from luvio_api.models import (
+    UserAccount,
+    UserProfile,
+    ProfileType,
+    TenantProfilesAddresses,
+    LandlordProfilesAddresses,
+    AgentProfilesAddresses,
+    Address,
+)
+from luvio_api.serializers import (
+    UserProfileSerializer,
+    AddressSerializer,
+    LandlordProfilesAddressesSerializer,
+)
 
 
 class UserProfileListView(APIView):
@@ -13,11 +25,19 @@ class UserProfileListView(APIView):
         """
         Get existing profiles of the logged in account
         """
-        # Ref: https://stackoverflow.com/a/12615192/8749888
         current_user = request.user
         profiles = get_list_or_404(UserProfile, account=current_user)
         serializer = UserProfileSerializer(profiles, many=True)
-        return Response(serializer.data)
+        all_profiles = [
+            {
+                **profile,
+                "profile_type_name": self._get_profile_type_name(
+                    profile["profile_type"]
+                ),
+            }
+            for profile in serializer.data
+        ]
+        return Response(all_profiles)
 
     def post(self, request: Request) -> Response:
         """
@@ -36,7 +56,7 @@ class UserProfileListView(APIView):
         data = {
             "avatar_link": request.data.get("avatar_link", None),
             "profile_pitch": request.data.get("profile_pitch", None),
-            "profile_type": request.data.get("profile_type", None),
+            "profile_type": request.data.get("profile_type"),
             "profile_url": request.data.get("profile_url", None),
             "account": current_user.id,
         }
@@ -57,16 +77,38 @@ class UserProfileListView(APIView):
         pass
         # TODO: implement url generation (unique for each profile)
 
+    def _get_profile_type_name(self, id: int) -> str:
+        return get_object_or_404(ProfileType, pk=id).profile_type
+
 
 class UserProfileDetailView(APIView):
     def get(self, request: Request, id: int) -> Response:
         """
         Get existing profile of the logged in account based on profile id
         """
-        # Ref: https://stackoverflow.com/a/12615192/8749888
         profile = self._get_profile(id, request.user)
+        profile_id = profile.id
+        profile_type_id = profile.profile_type
+        print(f"type id: {profile_type_id}, id: {profile_id}")
         serializer = UserProfileSerializer(profile)
-        return Response(serializer.data)
+        linked_addresses = get_list_or_404(
+            LandlordProfilesAddresses, profile=profile_id
+        )
+        print(f"length: {len(linked_addresses)}")
+        addresses = [
+            {
+                "ownership_start_date": linked_address["ownership_start_date"],
+                "ownership_end_date": linked_address["ownership_end_date"],
+                "is_current_residence": linked_address["is_current_residence"],
+                **AddressSerializer(
+                    Address.objects.get(pk=linked_address["address"])
+                ).data,
+            }
+            for linked_address in LandlordProfilesAddressesSerializer(
+                linked_addresses, many=True
+            ).data
+        ]
+        return Response({**serializer.data, "addresses": addresses})
 
     def put(self, request: Request, id: int) -> Response:
         """

@@ -7,3 +7,4 @@ from .address_view import get_address_suggestions
 from .tenant_profile_address_view import TenantProfilesAddressesView
 from .agent_profile_address_view import AgentProfilesAddressesView
 from .landlord_profile_address_view import LandlordProfilesAddressesView
+from .profiles_addresses_view import ProfilesAddressesView
