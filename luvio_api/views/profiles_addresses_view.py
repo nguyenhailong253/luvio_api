@@ -25,9 +25,6 @@ class ProfilesAddressesListView(APIView):
         state = get_state(request.data)
         address = get_address_from_payload(request.data, state)
         profile_type = get_object_or_404(UserProfile, pk=profile_id).profile_type
-        print(
-            f"profile type: {profile_type}, id: {profile_type.id}, name: {profile_type.profile_type}"
-        )
 
         data = self._construct_new_profile_address(
             profile_id, address, request.data, profile_type.id

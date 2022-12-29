@@ -19,8 +19,8 @@ class UserAccountView(APIView):
         account.username = request.data.get("username", account.username)
         account.first_name = request.data.get("first_name", account.first_name)
         account.last_name = request.data.get("last_name", account.last_name)
-        account.date_of_birth = request.data.get("date_of_birth", account.date_of_birth)
-        account.mobile = request.data.get("mobile", account.mobile)
+        account.date_of_birth = request.data.get("date_of_birth", None)
+        account.mobile = request.data.get("mobile", None)
         try:
             account.save()
         except Exception as e:

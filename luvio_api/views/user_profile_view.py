@@ -75,8 +75,8 @@ class UserProfileDetailView(APIView):
         Update an existing profile
         """
         profile = self._get_profile(profile_id, request.user)
-        profile.avatar_link = request.data.get("avatar_link", profile.avatar_link)
-        profile.profile_pitch = request.data.get("profile_pitch", profile.profile_pitch)
+        profile.avatar_link = request.data.get("avatar_link", None)
+        profile.profile_pitch = request.data.get("profile_pitch", None)
         profile.save()
         return Response(
             {

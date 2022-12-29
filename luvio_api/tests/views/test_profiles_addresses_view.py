@@ -17,6 +17,8 @@ from luvio_api.models import (
 
 
 class ProfilesAddressesTestCase(TestCase):
+    maxDiff = None
+
     @classmethod
     def setUpTestData(cls):
         # Main default user for testing

@@ -9,6 +9,8 @@ from luvio_api.models import StateAndTerritory, UserAccount
 
 
 class UserProfileTestCase(TestCase):
+    maxDiff = None
+
     @classmethod
     def setUpTestData(cls):
         # Main default user for testing
