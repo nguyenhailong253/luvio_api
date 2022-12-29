@@ -30,6 +30,3 @@ class UserProfile(models.Model):
         Address,
         through="ProfilesAddresses",
     )
-
-    def __str__(self):
-        return self.profile_url

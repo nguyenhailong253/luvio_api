@@ -4,8 +4,11 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from luvio_api.models import ProfileType, UserAccount, UserProfile
-from luvio_api.serializers import UserProfileSerializer
+from luvio_api.models import UserAccount, UserProfile
+from luvio_api.serializers import (
+    UserProfileCreateSerializer,
+    UserProfileGetFullDetailSerializer,
+)
 
 
 class UserProfileListView(APIView):
@@ -51,7 +54,7 @@ class UserProfileListView(APIView):
             "account": current_user.id,
         }
 
-        serializer = UserProfileSerializer(data=data)
+        serializer = UserProfileCreateSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         profile = serializer.save()
         return Response(
@@ -67,24 +70,21 @@ class UserProfileListView(APIView):
         pass
         # TODO: implement url generation (unique for each profile)
 
-    def _get_profile_type_name(self, id: int) -> str:
-        return get_object_or_404(ProfileType, pk=id).profile_type
-
 
 class UserProfileDetailView(APIView):
-    def get(self, request: Request, id: int) -> Response:
+    def get(self, request: Request, profile_id: int) -> Response:
         """
         Get existing profile of the logged in account based on profile id
         """
-        profile = self._get_profile(id, request.user)
-        serializer = UserProfileSerializer(profile)
+        profile = self._get_profile(profile_id, request.user)
+        serializer = UserProfileGetFullDetailSerializer(profile)
         return Response(serializer.data)
 
-    def put(self, request: Request, id: int) -> Response:
+    def put(self, request: Request, profile_id: int) -> Response:
         """
         Update an existing profile
         """
-        profile = self._get_profile(id, request.user)
+        profile = self._get_profile(profile_id, request.user)
         profile.avatar_link = request.data.get("avatar_link", profile.avatar_link)
         profile.profile_pitch = request.data.get("profile_pitch", profile.profile_pitch)
         profile.save()
@@ -94,16 +94,16 @@ class UserProfileDetailView(APIView):
             }
         )
 
-    def delete(self, request: Request, id: int) -> Response:
+    def delete(self, request: Request, profile_id: int) -> Response:
         """
         Delete an existing profile
         """
-        self._get_profile(id, request.user).delete()
+        self._get_profile(profile_id, request.user).delete()
         return Response(
             {
                 "message": "Successfully deleted profile!",
             }
         )
 
-    def _get_profile(self, id: int, account: UserAccount) -> UserProfile:
-        return get_object_or_404(UserProfile, pk=id, account=account)
+    def _get_profile(self, profile_id: int, account: UserAccount) -> UserProfile:
+        return get_object_or_404(UserProfile, pk=profile_id, account=account)

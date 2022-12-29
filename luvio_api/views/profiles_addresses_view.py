@@ -7,7 +7,6 @@ from rest_framework.views import APIView
 from luvio_api.common.constants import (
     DOMAIN_API_PAYLOAD_FIELDS,
     PROFILE_ADDRESS_ID,
-    PROFILE_TYPES,
     PROFILES_ADDRESSES_FIELD_MAPPINGS,
 )
 from luvio_api.common.domain_api_utils import (
@@ -57,7 +56,7 @@ class ProfilesAddressesListView(APIView):
 
     def _construct_new_profile_address(
         self, profile_id: int, address: Address, payload: dict, profile_type_id: str
-    ):
+    ) -> dict:
         return {
             "profile": profile_id,
             "address": address.id,
