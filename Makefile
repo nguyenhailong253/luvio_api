@@ -1,4 +1,5 @@
 run:
+	./ops/retrieve_secrets.sh
 	pipenv run python -m manage runserver
 
 migrate:
