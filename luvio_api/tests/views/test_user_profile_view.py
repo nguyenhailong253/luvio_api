@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 
 from django.test import TestCase
 from rest_framework import status
@@ -32,7 +33,7 @@ class UserProfileTestCase(TestCase):
             avatar_link="https://img.com",
             profile_pitch="Hi I'm a well known agent",
             profile_type=cls.agent_profile_type,
-            profile_url="testurl",
+            profile_url="agenturl",
             account=cls.default_user,
         )
 
@@ -41,13 +42,44 @@ class UserProfileTestCase(TestCase):
             avatar_link="https://img.com",
             profile_pitch="Hi I'm a well known tenant",
             profile_type=cls.tenant_profile_type,
-            profile_url="",
+            profile_url="tenanturl",
             account=cls.default_user,
         )
 
     def setUp(self):
         self.client = APIClient()
         self.client.force_authenticate(user=self.default_user)
+
+    def test_get_profile(self):
+        """
+        Test get all existing profiles
+        """
+        response = self.client.get("/profiles/").render()
+        expected_response = [
+            {
+                "id": self.agent_profile.id,
+                "avatar_link": "https://img.com",
+                "profile_pitch": "Hi I'm a well known agent",
+                "profile_url": "agenturl",
+                "date_created": datetime.strptime(
+                    self.agent_profile.date_created, "%Y-%m-%d"
+                ).date(),
+                "profile_type": "agent",
+            },
+            {
+                "id": self.tenant_profile.id,
+                "avatar_link": "https://img.com",
+                "profile_pitch": "Hi I'm a well known tenant",
+                "profile_url": "tenanturl",
+                "date_created": datetime.strptime(
+                    self.tenant_profile.date_created, "%Y-%m-%d"
+                ).date(),
+                "profile_type": "tenant",
+            },
+        ]
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, expected_response)
 
     def test_create_profile(self):
         """

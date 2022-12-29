@@ -15,17 +15,19 @@ class UserProfileListView(APIView):
         """
         current_user = request.user
         profiles = get_list_or_404(UserProfile, account=current_user)
-        serializer = UserProfileSerializer(profiles, many=True)
-        all_profiles = [
-            {
-                **profile,
-                "profile_type_name": self._get_profile_type_name(
-                    profile["profile_type"]
-                ),
-            }
-            for profile in serializer.data
-        ]
-        return Response(all_profiles)
+        return Response(
+            [
+                {
+                    "id": profile.id,
+                    "avatar_link": profile.avatar_link,
+                    "profile_pitch": profile.profile_pitch,
+                    "profile_url": profile.profile_url,
+                    "date_created": profile.date_created,
+                    "profile_type": profile.profile_type.profile_type,
+                }
+                for profile in profiles
+            ]
+        )
 
     def post(self, request: Request) -> Response:
         """
