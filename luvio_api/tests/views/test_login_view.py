@@ -8,6 +8,8 @@ from luvio_api.models import UserAccount
 
 
 class LoginViewTestCase(TestCase):
+    maxDiff = None
+
     @classmethod
     def setUpTestData(cls):
         # Ref: https://stackoverflow.com/a/33294746/8749888

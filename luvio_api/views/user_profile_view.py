@@ -5,7 +5,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from luvio_api.models import UserAccount, UserProfile
-from luvio_api.serializers import UserProfileSerializer
+from luvio_api.serializers import (
+    UserProfileCreateSerializer,
+    UserProfileGetFullDetailSerializer,
+    UserProfileListSerializer,
+)
 
 
 class UserProfileListView(APIView):
@@ -13,10 +17,9 @@ class UserProfileListView(APIView):
         """
         Get existing profiles of the logged in account
         """
-        # Ref: https://stackoverflow.com/a/12615192/8749888
         current_user = request.user
         profiles = get_list_or_404(UserProfile, account=current_user)
-        serializer = UserProfileSerializer(profiles, many=True)
+        serializer = UserProfileListSerializer(profiles, many=True)
         return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
@@ -36,12 +39,12 @@ class UserProfileListView(APIView):
         data = {
             "avatar_link": request.data.get("avatar_link", None),
             "profile_pitch": request.data.get("profile_pitch", None),
-            "profile_type": request.data.get("profile_type", None),
+            "profile_type": request.data.get("profile_type"),
             "profile_url": request.data.get("profile_url", None),
             "account": current_user.id,
         }
 
-        serializer = UserProfileSerializer(data=data)
+        serializer = UserProfileCreateSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         profile = serializer.save()
         return Response(
@@ -59,22 +62,21 @@ class UserProfileListView(APIView):
 
 
 class UserProfileDetailView(APIView):
-    def get(self, request: Request, id: int) -> Response:
+    def get(self, request: Request, profile_id: int) -> Response:
         """
         Get existing profile of the logged in account based on profile id
         """
-        # Ref: https://stackoverflow.com/a/12615192/8749888
-        profile = self._get_profile(id, request.user)
-        serializer = UserProfileSerializer(profile)
+        profile = self._get_profile(profile_id, request.user)
+        serializer = UserProfileGetFullDetailSerializer(profile)
         return Response(serializer.data)
 
-    def put(self, request: Request, id: int) -> Response:
+    def put(self, request: Request, profile_id: int) -> Response:
         """
         Update an existing profile
         """
-        profile = self._get_profile(id, request.user)
-        profile.avatar_link = request.data.get("avatar_link", profile.avatar_link)
-        profile.profile_pitch = request.data.get("profile_pitch", profile.profile_pitch)
+        profile = self._get_profile(profile_id, request.user)
+        profile.avatar_link = request.data.get("avatar_link", None)
+        profile.profile_pitch = request.data.get("profile_pitch", None)
         profile.save()
         return Response(
             {
@@ -82,16 +84,16 @@ class UserProfileDetailView(APIView):
             }
         )
 
-    def delete(self, request: Request, id: int) -> Response:
+    def delete(self, request: Request, profile_id: int) -> Response:
         """
         Delete an existing profile
         """
-        self._get_profile(id, request.user).delete()
+        self._get_profile(profile_id, request.user).delete()
         return Response(
             {
                 "message": "Successfully deleted profile!",
             }
         )
 
-    def _get_profile(self, id: int, account: UserAccount) -> UserProfile:
-        return get_object_or_404(UserProfile, pk=id, account=account)
+    def _get_profile(self, profile_id: int, account: UserAccount) -> UserProfile:
+        return get_object_or_404(UserProfile, pk=profile_id, account=account)

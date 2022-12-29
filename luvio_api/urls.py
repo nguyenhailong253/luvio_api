@@ -27,25 +27,20 @@ urlpatterns = [
     path("accounts/password/", views.change_password, name="change-password"),
     path("accounts/", views.UserAccountView.as_view(), name="accounts"),
     path(
-        "profiles/<int:id>/",
+        "profiles/<int:profile_id>/",
         views.UserProfileDetailView.as_view(),
         name="profile-detail",
     ),
     path("profiles/", views.UserProfileListView.as_view(), name="profiles"),
     path(
-        "profiles/tenant-profiles/<int:profile_id>/addresses/",
-        views.TenantProfilesAddressesView.as_view(),
-        name="tenant-profiles-addresses",
+        "profiles/<int:profile_id>/addresses/",
+        views.ProfilesAddressesListView.as_view(),
+        name="profiles-addresses",
     ),
     path(
-        "profiles/agent-profiles/<int:profile_id>/addresses/",
-        views.AgentProfilesAddressesView.as_view(),
-        name="agent-profiles-addresses",
-    ),
-    path(
-        "profiles/landlord-profiles/<int:profile_id>/addresses/",
-        views.LandlordProfilesAddressesView.as_view(),
-        name="landlord-profiles-addresses",
+        "profiles/<int:profile_id>/addresses/<int:profile_address_id>/",
+        views.ProfilesAddressesDetailView.as_view(),
+        name="profiles-addresses-detail",
     ),
     path("profile-types/", views.ProfileTypeView.as_view(), name="profile-types"),
     path(

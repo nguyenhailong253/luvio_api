@@ -8,6 +8,8 @@ from luvio_api.models import UserAccount
 
 
 class RegistrationViewTestCase(TestCase):
+    maxDiff = None
+
     @classmethod
     def setUpTestData(cls):
         cls.default_user = UserAccount.objects.create(
