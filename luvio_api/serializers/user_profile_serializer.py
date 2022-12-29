@@ -10,6 +10,24 @@ class UserProfileCreateSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserProfileListSerializer(serializers.ModelSerializer):
+    profile_type = serializers.SerializerMethodField()
+
+    def get_profile_type(self, profile: UserProfile) -> str:
+        return profile.profile_type.profile_type
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            "id",
+            "avatar_link",
+            "profile_pitch",
+            "profile_url",
+            "date_created",
+            "profile_type",
+        ]
+
+
 class UserProfileGetFullDetailSerializer(serializers.ModelSerializer):
     addresses = AddressGetFullDetailSerializer(many=True, read_only=True)
     profile_type = serializers.SerializerMethodField()

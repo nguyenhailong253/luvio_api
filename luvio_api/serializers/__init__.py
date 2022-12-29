@@ -5,4 +5,5 @@ from .profiles_addresses_serializer import ProfilesAddressesSerializer
 from .user_profile_serializer import (
     UserProfileCreateSerializer,
     UserProfileGetFullDetailSerializer,
+    UserProfileListSerializer,
 )

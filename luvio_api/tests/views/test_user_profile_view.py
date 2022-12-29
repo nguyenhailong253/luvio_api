@@ -1,14 +1,24 @@
+import json
 import unittest
-from datetime import datetime
 
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from luvio_api.models import ProfileType, UserAccount, UserProfile
+from luvio_api.models import (
+    Address,
+    ProfilesAddresses,
+    ProfileType,
+    StateAndTerritory,
+    Suburb,
+    UserAccount,
+    UserProfile,
+)
 
 
 class UserProfileTestCase(TestCase):
+    maxDiff = None
+
     @classmethod
     def setUpTestData(cls):
         # Main default user for testing
@@ -46,11 +56,52 @@ class UserProfileTestCase(TestCase):
             account=cls.default_user,
         )
 
+        # Create addresses linked to a profile
+        cls.state = StateAndTerritory.objects.create(
+            state_code="VIC", name="Victoria", country="Australia"
+        )
+        cls.suburb = Suburb.objects.create(
+            state_and_territory=cls.state, name="New Suburb", postcode="1100"
+        )
+        cls.address1 = Address.objects.create(
+            display_address="789 Brian Boulevard, New Suburb VIC 1100",
+            suburb=cls.suburb,
+            unit_number=None,
+            street_number="789",
+            street_name="Brian",
+            street_type="Boulevard",
+            street_type_abbrev="Bvd",
+        )
+        cls.address2 = Address.objects.create(
+            display_address="2/345 Mary Road, New Suburb VIC 1100",
+            suburb=cls.suburb,
+            unit_number="2",
+            street_number="345",
+            street_name="Mary",
+            street_type="Road",
+            street_type_abbrev="Rd",
+        )
+        ProfilesAddresses.objects.create(
+            profile=cls.tenant_profile,
+            address=cls.address1,
+            profile_type=cls.tenant_profile_type,
+            move_in_date="2022-01-01",
+            is_current_residence=True,
+        )
+        ProfilesAddresses.objects.create(
+            profile=cls.tenant_profile,
+            address=cls.address2,
+            profile_type=cls.tenant_profile_type,
+            move_in_date="2010-01-01",
+            move_out_date="2030-01-01",
+            is_current_residence=False,
+        )
+
     def setUp(self):
         self.client = APIClient()
         self.client.force_authenticate(user=self.default_user)
 
-    def test_get_profile(self):
+    def test_get_profiles(self):
         """
         Test get all existing profiles
         """
@@ -61,9 +112,7 @@ class UserProfileTestCase(TestCase):
                 "avatar_link": "https://img.com",
                 "profile_pitch": "Hi I'm a well known agent",
                 "profile_url": "agenturl",
-                "date_created": datetime.strptime(
-                    self.agent_profile.date_created, "%Y-%m-%d"
-                ).date(),
+                "date_created": self.agent_profile.date_created,
                 "profile_type": "agent",
             },
             {
@@ -71,15 +120,53 @@ class UserProfileTestCase(TestCase):
                 "avatar_link": "https://img.com",
                 "profile_pitch": "Hi I'm a well known tenant",
                 "profile_url": "tenanturl",
-                "date_created": datetime.strptime(
-                    self.tenant_profile.date_created, "%Y-%m-%d"
-                ).date(),
+                "date_created": self.tenant_profile.date_created,
                 "profile_type": "tenant",
             },
         ]
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, expected_response)
+        self.assertEqual(json.loads(json.dumps(response.data)), expected_response)
+
+    def test_get_single_profile(self):
+        """
+        Test get details of 1 profile
+        """
+        response = self.client.get(f"/profiles/{self.tenant_profile.id}/").render()
+        expected_response = {
+            "avatar_link": "https://img.com",
+            "profile_pitch": "Hi I'm a well known tenant",
+            "profile_url": "tenanturl",
+            "date_created": self.tenant_profile.date_created,
+            "profile_type": "tenant",
+            "addresses": [
+                {
+                    "display_address": "789 Brian Boulevard, New Suburb VIC 1100",
+                    "unit_number": None,
+                    "street_number": "789",
+                    "street_name": "Brian",
+                    "street_type": "Boulevard",
+                    "street_type_abbrev": "Bvd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                },
+                {
+                    "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                    "unit_number": "2",
+                    "street_number": "345",
+                    "street_name": "Mary",
+                    "street_type": "Road",
+                    "street_type_abbrev": "Rd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                },
+            ],
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(json.loads(json.dumps(response.data)), expected_response)
 
     def test_create_profile(self):
         """

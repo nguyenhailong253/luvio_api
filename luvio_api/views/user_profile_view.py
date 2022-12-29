@@ -8,6 +8,7 @@ from luvio_api.models import UserAccount, UserProfile
 from luvio_api.serializers import (
     UserProfileCreateSerializer,
     UserProfileGetFullDetailSerializer,
+    UserProfileListSerializer,
 )
 
 
@@ -18,19 +19,8 @@ class UserProfileListView(APIView):
         """
         current_user = request.user
         profiles = get_list_or_404(UserProfile, account=current_user)
-        return Response(
-            [
-                {
-                    "id": profile.id,
-                    "avatar_link": profile.avatar_link,
-                    "profile_pitch": profile.profile_pitch,
-                    "profile_url": profile.profile_url,
-                    "date_created": profile.date_created,
-                    "profile_type": profile.profile_type.profile_type,
-                }
-                for profile in profiles
-            ]
-        )
+        serializer = UserProfileListSerializer(profiles, many=True)
+        return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
         """
