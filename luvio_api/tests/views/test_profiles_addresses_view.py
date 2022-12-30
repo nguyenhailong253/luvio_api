@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from luvio_api.common.constants import PROFILE_ADDRESS_ID, PROFILE_TYPES
+from luvio_api.common.constants import PROFILE_TYPES
 from luvio_api.models import (
     Address,
     ProfilesAddresses,
@@ -159,22 +159,22 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.post(
             f"/profiles/{self.landlord_profile.id}/addresses/",
             {
-                "address": "1/123 John Street, Fake Suburb VIC 1000",
-                "unitNumber": "1",
-                "streetNumber": "123",
-                "streetName": "John",
-                "streetTypeLong": "Street",
-                "streetType": "St",
+                "display_address": "1/123 John Street, Fake Suburb VIC 1000",
+                "unit_number": "1",
+                "street_number": "123",
+                "street_name": "John",
+                "street_type": "Street",
+                "street_type_abbrev": "St",
                 "suburb": "Fake Suburb",
-                "postCode": "1000",
+                "postcode": "1000",
                 "state": "VIC",
-                "moveInDate": None,
-                "moveOutDate": None,
-                "managementStartDate": None,
-                "managementEndDate": None,
-                "ownershipStartDate": "2023-01-01",
-                "ownershipEndDate": "2024-01-01",
-                "isCurrentResidence": False,
+                "move_in_date": None,
+                "move_out_date": None,
+                "management_start_date": None,
+                "management_end_date": None,
+                "ownership_start_date": "2023-01-01",
+                "ownership_end_date": "2024-01-01",
+                "is_current_residence": False,
             },
         ).render()
 
@@ -182,7 +182,7 @@ class ProfilesAddressesTestCase(TestCase):
             display_address="1/123 John Street, Fake Suburb VIC 1000"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(response.data[PROFILE_ADDRESS_ID])
+        self.assertTrue(response.data["profile_address_id"])
         self.assertTrue(
             ProfilesAddresses.objects.filter(
                 profile=self.landlord_profile,
@@ -199,17 +199,17 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.post(
             f"/profiles/{self.agent_profile.id}/addresses/",
             {
-                "address": "2/345 Mary Road, New Suburb VIC 1100",
-                "unitNumber": "2",
-                "streetNumber": "345",
-                "streetName": "Mary",
-                "streetTypeLong": "Road",
-                "streetType": "Rd",
+                "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                "unit_number": "2",
+                "street_number": "345",
+                "street_name": "Mary",
+                "street_type": "Road",
+                "street_type_abbrev": "Rd",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "managementStartDate": "2023-01-01",
-                "managementEndDate": "2024-01-01",
+                "management_start_date": "2023-01-01",
+                "management_end_date": "2024-01-01",
             },
         ).render()
 
@@ -217,7 +217,7 @@ class ProfilesAddressesTestCase(TestCase):
             display_address="2/345 Mary Road, New Suburb VIC 1100"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(response.data[PROFILE_ADDRESS_ID])
+        self.assertTrue(response.data["profile_address_id"])
         self.assertTrue(
             ProfilesAddresses.objects.filter(
                 profile=self.agent_profile,
@@ -234,18 +234,18 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.post(
             f"/profiles/{self.tenant_profile.id}/addresses/",
             {
-                "address": "1/123 John Street, Fake Suburb VIC 1000",
-                "unitNumber": "1",
-                "streetNumber": "123",
-                "streetName": "John",
-                "streetTypeLong": "Street",
-                "streetType": "St",
+                "display_address": "1/123 John Street, Fake Suburb VIC 1000",
+                "unit_number": "1",
+                "street_number": "123",
+                "street_name": "John",
+                "street_type": "Street",
+                "street_type_abbrev": "St",
                 "suburb": "Fake Suburb",
-                "postCode": "1000",
+                "postcode": "1000",
                 "state": "VIC",
-                "moveInDate": "2022-01-01",
-                "moveOutDate": "2023-01-01",
-                "isCurrentResidence": True,
+                "move_in_date": "2022-01-01",
+                "move_out_date": "2023-01-01",
+                "is_current_residence": True,
             },
         ).render()
 
@@ -253,7 +253,7 @@ class ProfilesAddressesTestCase(TestCase):
             display_address="1/123 John Street, Fake Suburb VIC 1000"
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(response.data[PROFILE_ADDRESS_ID])
+        self.assertTrue(response.data["profile_address_id"])
         self.assertTrue(
             ProfilesAddresses.objects.filter(
                 profile=self.tenant_profile,
@@ -272,16 +272,16 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.post(
             f"/profiles/{self.landlord_profile.id}/addresses/",
             {
-                "address": "789 Brian Boulevard, New Suburb VIC 1100",
-                "unitNumber": None,
-                "streetNumber": "789",
-                "streetName": "Brian",
-                "streetTypeLong": "Boulevard",
-                "streetType": "Bvd",
+                "display_address": "789 Brian Boulevard, New Suburb VIC 1100",
+                "unit_number": None,
+                "street_number": "789",
+                "street_name": "Brian",
+                "street_type": "Boulevard",
+                "street_type_abbrev": "Bvd",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "ownershipStartDate": "2016-01-01",
+                "ownership_start_date": "2016-01-01",
             },
         ).render()
 
@@ -296,17 +296,17 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.post(
             f"/profiles/{self.agent_profile.id}/addresses/",
             {
-                "address": "789 Brian Boulevard, New Suburb VIC 1100",
-                "unitNumber": None,
-                "streetNumber": "789",
-                "streetName": "Brian",
-                "streetTypeLong": "Boulevard",
-                "streetType": "Bvd",
+                "display_address": "789 Brian Boulevard, New Suburb VIC 1100",
+                "unit_number": None,
+                "street_number": "789",
+                "street_name": "Brian",
+                "street_type": "Boulevard",
+                "street_type_abbrev": "Bvd",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "managementStartDate": "2025-01-01",
-                "managementEndDate": None,
+                "management_start_date": "2025-01-01",
+                "management_end_date": None,
             },
         ).render()
 
@@ -319,16 +319,16 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.post(
             f"/profiles/{self.tenant_profile.id}/addresses/",
             {
-                "address": "789 Brian Boulevard, New Suburb VIC 1100",
-                "unitNumber": None,
-                "streetNumber": "789",
-                "streetName": "Brian",
-                "streetTypeLong": "Boulevard",
-                "streetType": "Bvd",
+                "display_address": "789 Brian Boulevard, New Suburb VIC 1100",
+                "unit_number": None,
+                "street_number": "789",
+                "street_name": "Brian",
+                "street_type": "Boulevard",
+                "street_type_abbrev": "Bvd",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "moveInDate": "2022-01-01",
+                "move_in_date": "2022-01-01",
             },
         ).render()
 
@@ -341,18 +341,18 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.put(
             f"/profiles/{self.landlord_profile.id}/addresses/{self.profileAddressEntry1.id}/",
             {
-                "address": "911 Emergency Lane, New Suburb VIC 1100",
-                "unitNumber": None,
-                "streetNumber": "911",
-                "streetName": "Emergency",
-                "streetTypeLong": "Lane",
-                "streetType": "Ln",
+                "display_address": "911 Emergency Lane, New Suburb VIC 1100",
+                "unit_number": None,
+                "street_number": "911",
+                "street_name": "Emergency",
+                "street_type": "Lane",
+                "street_type_abbrev": "Ln",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "ownershipStartDate": "2022-12-31",
-                "ownershipEndDate": "2023-12-31",
-                "isCurrentResidence": True,
+                "ownership_start_date": "2022-12-31",
+                "ownership_end_date": "2023-12-31",
+                "is_current_residence": True,
             },
         ).render()
 
@@ -376,17 +376,17 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.put(
             f"/profiles/{self.agent_profile.id}/addresses/{self.profileAddressEntry2.id}/",
             {
-                "address": "911 Emergency Lane, New Suburb VIC 1100",
-                "unitNumber": None,
-                "streetNumber": "911",
-                "streetName": "Emergency",
-                "streetTypeLong": "Lane",
-                "streetType": "Ln",
+                "display_address": "911 Emergency Lane, New Suburb VIC 1100",
+                "unit_number": None,
+                "street_number": "911",
+                "street_name": "Emergency",
+                "street_type": "Lane",
+                "street_type_abbrev": "Ln",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "managementStartDate": "2022-12-31",
-                "managementEndDate": "2023-12-31",
+                "management_start_date": "2022-12-31",
+                "management_end_date": "2023-12-31",
             },
         ).render()
 
@@ -410,16 +410,16 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.put(
             f"/profiles/{self.tenant_profile.id}/addresses/{self.profileAddressEntry3.id}/",
             {
-                "address": "911 Emergency Lane, New Suburb VIC 1100",
-                "unitNumber": None,
-                "streetNumber": "911",
-                "streetName": "Emergency",
-                "streetTypeLong": "Lane",
-                "streetType": "Ln",
+                "display_address": "911 Emergency Lane, New Suburb VIC 1100",
+                "unit_number": None,
+                "street_number": "911",
+                "street_name": "Emergency",
+                "street_type": "Lane",
+                "street_type_abbrev": "Ln",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "moveInDate": "2022-12-31",
+                "move_in_date": "2022-12-31",
             },
         ).render()
 
@@ -431,7 +431,7 @@ class ProfilesAddressesTestCase(TestCase):
         )
         self.assertEqual(profile_address.move_out_date, None)
         self.assertEqual(profile_address.address, self.address2)
-        self.assertTrue(profile_address.is_current_residence)
+        self.assertFalse(profile_address.is_current_residence)
 
     def test_update_address_in_landlord_profile_when_same_address_and_ownership_start_date(
         self,
@@ -442,16 +442,16 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.put(
             f"/profiles/{self.landlord_profile.id}/addresses/{self.profileAddressEntry1.id}/",
             {
-                "address": "2/345 Mary Road, New Suburb VIC 1100",
-                "unitNumber": "2",
-                "streetNumber": "345",
-                "streetName": "Mary",
-                "streetTypeLong": "Road",
-                "streetType": "Rd",
+                "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                "unit_number": "2",
+                "street_number": "345",
+                "street_name": "Mary",
+                "street_type": "Road",
+                "street_type_abbrev": "Rd",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "ownershipStartDate": "2010-01-01",
+                "ownership_start_date": "2010-01-01",
             },
         ).render()
 
@@ -466,16 +466,16 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.put(
             f"/profiles/{self.agent_profile.id}/addresses/{self.profileAddressEntry2.id}/",
             {
-                "address": "2/345 Mary Road, New Suburb VIC 1100",
-                "unitNumber": "2",
-                "streetNumber": "345",
-                "streetName": "Mary",
-                "streetTypeLong": "Road",
-                "streetType": "Rd",
+                "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                "unit_number": "2",
+                "street_number": "345",
+                "street_name": "Mary",
+                "street_type": "Road",
+                "street_type_abbrev": "Rd",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "managementStartDate": "2010-01-01",
+                "management_start_date": "2010-01-01",
             },
         ).render()
 
@@ -490,16 +490,16 @@ class ProfilesAddressesTestCase(TestCase):
         response = self.client.put(
             f"/profiles/{self.tenant_profile.id}/addresses/{self.profileAddressEntry3.id}/",
             {
-                "address": "2/345 Mary Road, New Suburb VIC 1100",
-                "unitNumber": "2",
-                "streetNumber": "345",
-                "streetName": "Mary",
-                "streetTypeLong": "Road",
-                "streetType": "Rd",
+                "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                "unit_number": "2",
+                "street_number": "345",
+                "street_name": "Mary",
+                "street_type": "Road",
+                "street_type_abbrev": "Rd",
                 "suburb": "New Suburb",
-                "postCode": "1100",
+                "postcode": "1100",
                 "state": "VIC",
-                "moveInDate": "2010-01-01",
+                "move_in_date": "2010-01-01",
             },
         ).render()
 

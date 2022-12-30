@@ -47,19 +47,15 @@ class UserProfileTestCase(TestCase):
         MagicMock(
             return_value=[
                 {
-                    "address": "1/123 John Street, Fake Suburb VIC 1000",
-                    "addressComponents": {
-                        "unitNumber": "1",
-                        "streetNumber": "123",
-                        "streetName": "John",
-                        "streetType": "St",
-                        "streetTypeLong": "Street",
-                        "suburb": "Fake Suburb",
-                        "postCode": "1000",
-                        "state": "VIC",
-                    },
-                    "id": "NC-6907-CZ",
-                    "relativeScore": 100,
+                    "display_address": "1/123 John Street, Fake Suburb VIC 1000",
+                    "unit_number": "1",
+                    "street_number": "123",
+                    "street_name": "John",
+                    "street_type_abbrev": "St",
+                    "street_type": "Street",
+                    "suburb": "Fake Suburb",
+                    "postcode": "1000",
+                    "state": "VIC",
                 }
             ]
         ),
