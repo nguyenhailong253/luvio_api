@@ -5,6 +5,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import HTTPError
 
+from luvio_api.common.domain_api_utils import (
+    convert_address_suggestion_fields_to_snake_case,
+)
+
 env = environ.Env()
 # reading .env file - not checked into git
 environ.Env.read_env()
@@ -52,13 +56,14 @@ class DomainApiClient:
         except HTTPError as e:
             status_code = e.response.status_code
             if status_code == 401:
-                self._refresh_token()
+                self.access_token = self._refresh_token()
                 headers = {"Authorization": f"Bearer {self.access_token}"}
                 response = requests.get(url, headers=headers, timeout=TIMEOUT)
+                response.raise_for_status()
             else:
                 raise e
         return response.json()
 
     def get_address_suggestions(self, search_term_url_encoded: str) -> Iterable[Any]:
         url = f"{DOMAIN_API_PROPERTIES_URL}/_suggest?terms={search_term_url_encoded}&channel=All"
-        return self._get(url)
+        return convert_address_suggestion_fields_to_snake_case(self._get(url))

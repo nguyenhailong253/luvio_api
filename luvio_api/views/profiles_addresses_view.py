@@ -4,11 +4,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from luvio_api.common.constants import (
-    DOMAIN_API_PAYLOAD_FIELDS,
-    PROFILE_ADDRESS_ID,
-    PROFILES_ADDRESSES_FIELD_MAPPINGS,
-)
 from luvio_api.common.domain_api_utils import (
     get_or_create_address,
     get_or_create_suburb,
@@ -46,7 +41,7 @@ class ProfilesAddressesListView(APIView):
         return Response(
             {
                 "message": "Successfully linked address to current profile",
-                PROFILE_ADDRESS_ID: record.id,
+                "profile_address_id": record.id,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -58,27 +53,13 @@ class ProfilesAddressesListView(APIView):
             "profile": profile_id,
             "address": address.id,
             "profile_type": profile_type_id,
-            "move_in_date": payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"], None
-            ),
-            "move_out_date": payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"], None
-            ),
-            "management_start_date": payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["management_start_date"], None
-            ),
-            "management_end_date": payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["management_end_date"], None
-            ),
-            "ownership_start_date": payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["ownership_start_date"], None
-            ),
-            "ownership_end_date": payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["ownership_end_date"], None
-            ),
-            "is_current_residence": payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"], False
-            ),
+            "move_in_date": payload.get("move_in_date", None),
+            "move_out_date": payload.get("move_out_date", None),
+            "management_start_date": payload.get("management_start_date", None),
+            "management_end_date": payload.get("management_end_date", None),
+            "ownership_start_date": payload.get("ownership_start_date", None),
+            "ownership_end_date": payload.get("ownership_end_date", None),
+            "is_current_residence": payload.get("is_current_residence", False),
         }
 
     def _has_duplicated_address_in_profile(
@@ -179,43 +160,31 @@ class ProfilesAddressesDetailView(APIView):
     ):
         profile_address.address = address
         profile_address.is_current_residence = payload.get(
-            PROFILES_ADDRESSES_FIELD_MAPPINGS["is_current_residence"],
-            profile_address.is_current_residence,
+            "is_current_residence",
+            False,
         )
         if profile_address.profile_type.profile_type == "tenant":
-            profile_address.move_in_date = payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["move_in_date"], None
-            )
-            profile_address.move_out_date = payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["move_out_date"], None
-            )
+            profile_address.move_in_date = payload.get("move_in_date", None)
+            profile_address.move_out_date = payload.get("move_out_date", None)
         if profile_address.profile_type.profile_type == "agent":
             profile_address.management_start_date = payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["management_start_date"], None
+                "management_start_date", None
             )
             profile_address.management_end_date = payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["management_end_date"], None
+                "management_end_date", None
             )
         if profile_address.profile_type.profile_type == "landlord":
             profile_address.ownership_start_date = payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["ownership_start_date"], None
+                "ownership_start_date", None
             )
-            profile_address.ownership_end_date = payload.get(
-                PROFILES_ADDRESSES_FIELD_MAPPINGS["ownership_end_date"], None
-            )
+            profile_address.ownership_end_date = payload.get("ownership_end_date", None)
 
 
 def get_state(payload: dict) -> StateAndTerritory:
-    return StateAndTerritory.objects.get(
-        state_code=payload[DOMAIN_API_PAYLOAD_FIELDS["state"]]
-    )
+    return StateAndTerritory.objects.get(state_code=payload["state"])
 
 
 def get_address_from_payload(payload: dict, state: StateAndTerritory) -> Address:
     suburb = get_or_create_suburb(payload, state)
-    address = get_or_create_address(
-        payload,
-        suburb,
-        payload[DOMAIN_API_PAYLOAD_FIELDS["display_address"]],
-    )
+    address = get_or_create_address(payload, suburb)
     return address
