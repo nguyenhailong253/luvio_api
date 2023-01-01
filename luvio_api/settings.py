@@ -167,3 +167,29 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# https://docs.djangoproject.com/en/4.1/howto/logging/
+# https://docs.djangoproject.com/en/4.1/ref/logging/#default-logging-configuration
+# https://docs.djangoproject.com/en/4.1/topics/logging/
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            # https://docs.python.org/3/library/logging.html#logrecord-attributes
+            "format": "[{asctime}] [{module}.{funcName}] [{levelname}] {message}",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "style": "{",
+        },
+    },
+    # https://docs.python.org/3/library/logging.handlers.html#module-logging.handlers
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "verbose"},
+    },
+    "loggers": {
+        "luvio_api": {
+            "handlers": ["console"],  # add more type of handlers later on
+            "level": "DEBUG",
+        }
+    },
+}

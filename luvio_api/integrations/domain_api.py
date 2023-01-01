@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Iterable
 
 import environ
@@ -6,10 +7,12 @@ from django.core.exceptions import ImproperlyConfigured
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import HTTPError
 
+from luvio_api.common.constants import DEFAULT_LOGGER
 from luvio_api.common.domain_api_utils import (
     convert_address_suggestion_fields_to_snake_case,
 )
 
+logger = logging.getLogger(DEFAULT_LOGGER)
 env = environ.Env()
 # reading .env file - not checked into git
 environ.Env.read_env()
@@ -31,7 +34,7 @@ class DomainApiClient:
         try:
             self.access_token = env("DOMAIN_API_TOKEN")
         except ImproperlyConfigured as e:
-            print(f"No API token found for Domain API: {e}")
+            logger.exception(f"No API token found for Domain API: {e}")
             self._refresh_token()
 
     def _refresh_token(self):
@@ -62,6 +65,7 @@ class DomainApiClient:
             return self._get(url)
         except HTTPError as e:
             status_code = e.response.status_code
+            logger.error(f"Failed to send GET requests to {url}: {e}")
             if status_code == 401:
                 self._refresh_token()
                 return self._get(url)

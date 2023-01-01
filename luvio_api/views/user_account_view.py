@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import get_object_or_404
 from rest_framework import exceptions, status
 from rest_framework.decorators import api_view
@@ -5,7 +7,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from luvio_api.common.constants import DEFAULT_LOGGER
 from luvio_api.models import UserAccount
+
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class UserAccountView(APIView):
@@ -24,6 +29,7 @@ class UserAccountView(APIView):
         try:
             account.save()
         except Exception as e:
+            logger.exception(f"Update account failed - {e}")
             raise exceptions.ValidationError(
                 {"message": f"Unable to update account - {e}"}
             )

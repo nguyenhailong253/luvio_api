@@ -11,3 +11,5 @@ PROFILE_TYPES = {
     "agent": "agent",
     "landlord": "landlord",
 }
+
+DEFAULT_LOGGER = "luvio_api"

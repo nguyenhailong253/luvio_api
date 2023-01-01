@@ -1,15 +1,20 @@
+import logging
+
 from django.shortcuts import get_object_or_404
 from rest_framework import exceptions, status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from luvio_api.common.constants import DEFAULT_LOGGER
 from luvio_api.common.domain_api_utils import (
     get_or_create_address,
     get_or_create_suburb,
 )
 from luvio_api.models import Address, ProfilesAddresses, StateAndTerritory, UserProfile
 from luvio_api.serializers import ProfilesAddressesSerializer
+
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class ProfilesAddressesListView(APIView):
@@ -28,6 +33,9 @@ class ProfilesAddressesListView(APIView):
         if self._has_duplicated_address_in_profile(
             profile_id, address, data, profile_type.profile_type
         ):
+            logger.error(
+                f"Duplicated address and start date in the same profile. Profile id: {profile_id}"
+            )
             return Response(
                 {
                     "message": "You cannot have the same address with the same start date more than once within one profile"
@@ -100,6 +108,9 @@ class ProfilesAddressesDetailView(APIView):
         self._update_profile_address(profile_address, request.data, address)
 
         if self._has_duplicated_address_in_profile(profile_address):
+            logger.error(
+                f"Duplicated address and start date in the same profile. Profile id: {profile_id}, profile address id: {profile_address_id}"
+            )
             return Response(
                 {
                     "message": "You cannot have the same address with the same start date more than once within one profile"
