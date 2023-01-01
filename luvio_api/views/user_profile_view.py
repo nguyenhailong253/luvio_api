@@ -1,15 +1,20 @@
+import logging
+
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from luvio_api.common.constants import DEFAULT_LOGGER
 from luvio_api.models import UserAccount, UserProfile
 from luvio_api.serializers import (
     UserProfileCreateSerializer,
     UserProfileGetFullDetailSerializer,
     UserProfileListSerializer,
 )
+
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class UserProfileListView(APIView):
@@ -30,6 +35,9 @@ class UserProfileListView(APIView):
         if UserProfile.objects.filter(
             profile_type=request.data.get("profile_type"), account=current_user
         ).exists():
+            logger.error(
+                f"Failed to create a new profile because this profile type already exists in this account. User '{current_user}'"
+            )
             return Response(
                 {
                     "message": "This account already has a profile with this profile type"

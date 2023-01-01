@@ -15,7 +15,8 @@ disable =
     W0511, # todo
     W0703, # catching too general exception
     W0613, # unused argument
-    R,C # Ref: https://stackoverflow.com/a/31908039/8749888
+    R,C, # Ref: https://stackoverflow.com/a/31908039/8749888
+    W1203 # logging-fstring-interpolation Ref: https://stackoverflow.com/a/59027338/8749888
 ignore=migrations,settings.py
 # When enabled, pylint would attempt to guess common misconfiguration and emit
 # user-friendly hints instead of false-positive error messages.
@@ -299,7 +300,7 @@ preferred-modules=
 
 # The type of string formatting that logging methods do. `old` means using %
 # formatting, `new` is for `{}` formatting.
-logging-format-style=old
+logging-format-style=new
 
 # Logging modules to check that the string format arguments are in logging
 # function parameter format.

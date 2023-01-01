@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import authenticate
 from rest_framework import exceptions
 from rest_framework.authtoken.models import Token
@@ -6,7 +8,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from luvio_api.common.constants import DEFAULT_LOGGER
 from luvio_api.models import UserAccount
+
+logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class LoginView(ObtainAuthToken):
@@ -27,9 +32,8 @@ class LoginView(ObtainAuthToken):
                     "username": user.username,
                 }
             )
-        raise exceptions.NotFound(
-            "Incorrect username or password - unable to authenticate!"
-        )
+        logger.error(f"Unable to log in - Incorrect username '{username}' or password")
+        raise exceptions.NotFound("Incorrect username or password - unable to log in!")
 
     def _get_username(self, payload: dict) -> str:
         if payload.get("email", None):
