@@ -81,19 +81,27 @@ class UserProfileTestCase(TestCase):
             street_type="Road",
             street_type_abbrev="Rd",
         )
-        ProfilesAddresses.objects.create(
+        cls.profile_address_entry1 = ProfilesAddresses.objects.create(
             profile=cls.tenant_profile,
             address=cls.address1,
             profile_type=cls.tenant_profile_type,
             move_in_date="2022-01-01",
             is_current_residence=True,
         )
-        ProfilesAddresses.objects.create(
+        cls.profile_address_entry2 = ProfilesAddresses.objects.create(
             profile=cls.tenant_profile,
             address=cls.address2,
             profile_type=cls.tenant_profile_type,
             move_in_date="2010-01-01",
             move_out_date="2030-01-01",
+            is_current_residence=False,
+        )
+        cls.profile_address_entry3 = ProfilesAddresses.objects.create(
+            profile=cls.tenant_profile,
+            address=cls.address2,
+            profile_type=cls.tenant_profile_type,
+            move_in_date="2000-01-01",
+            move_out_date="2005-01-01",
             is_current_residence=False,
         )
 
@@ -150,6 +158,14 @@ class UserProfileTestCase(TestCase):
                     "suburb": "New Suburb",
                     "postcode": "1100",
                     "state": "VIC",
+                    "move_in_date": self.profile_address_entry1.move_in_date,
+                    "move_out_date": None,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": True,
+                    "profile_address_relation_id": self.profile_address_entry1.id,
                 },
                 {
                     "display_address": "2/345 Mary Road, New Suburb VIC 1100",
@@ -161,12 +177,41 @@ class UserProfileTestCase(TestCase):
                     "suburb": "New Suburb",
                     "postcode": "1100",
                     "state": "VIC",
+                    "move_in_date": self.profile_address_entry2.move_in_date,
+                    "move_out_date": self.profile_address_entry2.move_out_date,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": False,
+                    "profile_address_relation_id": self.profile_address_entry2.id,
+                },
+                {
+                    "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                    "unit_number": "2",
+                    "street_number": "345",
+                    "street_name": "Mary",
+                    "street_type": "Road",
+                    "street_type_abbrev": "Rd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                    "move_in_date": self.profile_address_entry3.move_in_date,
+                    "move_out_date": self.profile_address_entry3.move_out_date,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": False,
+                    "profile_address_relation_id": self.profile_address_entry3.id,
                 },
             ],
         }
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(json.loads(json.dumps(response.data)), expected_response)
+        self.assertEqual(
+            json.loads(json.dumps(response.data, default=str)), expected_response
+        )
 
     def test_create_profile(self):
         """

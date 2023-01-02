@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 
 from luvio_api.common.constants import DEFAULT_LOGGER
 from luvio_api.models import UserAccount
+from luvio_api.serializers import UserAccountSerializer
 
 logger = logging.getLogger(DEFAULT_LOGGER)
 
@@ -18,16 +19,11 @@ class UserAccountView(APIView):
         """
         Update an existing account's details (excluding password)
         """
-        current_account = request.user
-        account = get_object_or_404(UserAccount, pk=current_account.id)
-        account.email = request.data.get("email", account.email)
-        account.username = request.data.get("username", account.username)
-        account.first_name = request.data.get("first_name", account.first_name)
-        account.last_name = request.data.get("last_name", account.last_name)
-        account.date_of_birth = request.data.get("date_of_birth", None)
-        account.mobile = request.data.get("mobile", None)
+        account = get_object_or_404(UserAccount, pk=request.user.id)
+        serializer = UserAccountSerializer(account, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
         try:
-            account.save()
+            serializer.save()
         except Exception as e:
             logger.exception(f"Update account failed - {e}")
             raise exceptions.ValidationError(

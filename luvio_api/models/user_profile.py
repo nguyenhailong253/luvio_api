@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db import models
 
-from luvio_api.common.constants import TEXT_FIELD_MAX_LENGTH
+from luvio_api.common.constants import DATE_FORMAT, TEXT_FIELD_MAX_LENGTH
 from luvio_api.models import Address, ProfileType, UserAccount
 
 
@@ -25,7 +25,7 @@ class UserProfile(models.Model):
         unique=True,
     )
     # Could have used models.DateField(auto_now_add=True) ref: https://stackoverflow.com/a/51389274/8749888
-    date_created = models.DateField(default=datetime.today().strftime("%Y-%m-%d"))
+    date_created = models.DateField(default=datetime.today().strftime(DATE_FORMAT))
     addresses = models.ManyToManyField(
         Address,
         through="ProfilesAddresses",

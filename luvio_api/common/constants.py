@@ -13,3 +13,5 @@ PROFILE_TYPES = {
 }
 
 DEFAULT_LOGGER = "luvio_api"
+
+DATE_FORMAT = "%Y-%m-%d"

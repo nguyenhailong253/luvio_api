@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from luvio_api.common.constants import PROFILE_TYPES
+from luvio_api.common.constants import DATE_FORMAT, PROFILE_TYPES
 from luvio_api.models import (
     Address,
     ProfilesAddresses,
@@ -103,7 +103,7 @@ class ProfilesAddressesTestCase(TestCase):
         )
 
         # Create addresses already linked to profile
-        cls.profileAddressEntry1 = ProfilesAddresses.objects.create(
+        cls.profile_address_entry1 = ProfilesAddresses.objects.create(
             profile=cls.landlord_profile,
             address=cls.address1,
             profile_type=cls.landlord_profile_type,
@@ -118,7 +118,7 @@ class ProfilesAddressesTestCase(TestCase):
             ownership_end_date="2030-01-01",
             is_current_residence=True,
         )
-        cls.profileAddressEntry2 = ProfilesAddresses.objects.create(
+        cls.profile_address_entry2 = ProfilesAddresses.objects.create(
             profile=cls.agent_profile,
             address=cls.address1,
             profile_type=cls.agent_profile_type,
@@ -132,7 +132,7 @@ class ProfilesAddressesTestCase(TestCase):
             management_start_date="2010-01-01",
             management_end_date="2030-01-01",
         )
-        cls.profileAddressEntry3 = ProfilesAddresses.objects.create(
+        cls.profile_address_entry3 = ProfilesAddresses.objects.create(
             profile=cls.tenant_profile,
             address=cls.address1,
             profile_type=cls.tenant_profile_type,
@@ -339,7 +339,7 @@ class ProfilesAddressesTestCase(TestCase):
         Test successfully update address in a landlord profile
         """
         response = self.client.put(
-            f"/profiles/{self.landlord_profile.id}/addresses/{self.profileAddressEntry1.id}/",
+            f"/profiles/{self.landlord_profile.id}/addresses/{self.profile_address_entry1.id}/",
             {
                 "display_address": "911 Emergency Lane, New Suburb VIC 1100",
                 "unit_number": None,
@@ -356,14 +356,16 @@ class ProfilesAddressesTestCase(TestCase):
             },
         ).render()
 
-        profile_address = ProfilesAddresses.objects.get(pk=self.profileAddressEntry1.id)
+        profile_address = ProfilesAddresses.objects.get(
+            pk=self.profile_address_entry1.id
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            profile_address.ownership_start_date.strftime("%Y-%m-%d"),
+            profile_address.ownership_start_date.strftime(DATE_FORMAT),
             "2022-12-31",
         )
         self.assertEqual(
-            profile_address.ownership_end_date.strftime("%Y-%m-%d"),
+            profile_address.ownership_end_date.strftime(DATE_FORMAT),
             "2023-12-31",
         )
         self.assertEqual(profile_address.address, self.address2)
@@ -374,7 +376,7 @@ class ProfilesAddressesTestCase(TestCase):
         Test successfully update address in an agent profile
         """
         response = self.client.put(
-            f"/profiles/{self.agent_profile.id}/addresses/{self.profileAddressEntry2.id}/",
+            f"/profiles/{self.agent_profile.id}/addresses/{self.profile_address_entry2.id}/",
             {
                 "display_address": "911 Emergency Lane, New Suburb VIC 1100",
                 "unit_number": None,
@@ -390,14 +392,16 @@ class ProfilesAddressesTestCase(TestCase):
             },
         ).render()
 
-        profile_address = ProfilesAddresses.objects.get(pk=self.profileAddressEntry2.id)
+        profile_address = ProfilesAddresses.objects.get(
+            pk=self.profile_address_entry2.id
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            profile_address.management_start_date.strftime("%Y-%m-%d"),
+            profile_address.management_start_date.strftime(DATE_FORMAT),
             "2022-12-31",
         )
         self.assertEqual(
-            profile_address.management_end_date.strftime("%Y-%m-%d"),
+            profile_address.management_end_date.strftime(DATE_FORMAT),
             "2023-12-31",
         )
         self.assertEqual(profile_address.address, self.address2)
@@ -408,7 +412,7 @@ class ProfilesAddressesTestCase(TestCase):
         Test successfully update address in a tenant profile
         """
         response = self.client.put(
-            f"/profiles/{self.tenant_profile.id}/addresses/{self.profileAddressEntry3.id}/",
+            f"/profiles/{self.tenant_profile.id}/addresses/{self.profile_address_entry3.id}/",
             {
                 "display_address": "911 Emergency Lane, New Suburb VIC 1100",
                 "unit_number": None,
@@ -423,10 +427,12 @@ class ProfilesAddressesTestCase(TestCase):
             },
         ).render()
 
-        profile_address = ProfilesAddresses.objects.get(pk=self.profileAddressEntry3.id)
+        profile_address = ProfilesAddresses.objects.get(
+            pk=self.profile_address_entry3.id
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            profile_address.move_in_date.strftime("%Y-%m-%d"),
+            profile_address.move_in_date.strftime(DATE_FORMAT),
             "2022-12-31",
         )
         self.assertEqual(profile_address.move_out_date, None)
@@ -440,7 +446,7 @@ class ProfilesAddressesTestCase(TestCase):
         Test unable to update address in landlord profile when other entries have the same address and ownership start date
         """
         response = self.client.put(
-            f"/profiles/{self.landlord_profile.id}/addresses/{self.profileAddressEntry1.id}/",
+            f"/profiles/{self.landlord_profile.id}/addresses/{self.profile_address_entry1.id}/",
             {
                 "display_address": "2/345 Mary Road, New Suburb VIC 1100",
                 "unit_number": "2",
@@ -464,7 +470,7 @@ class ProfilesAddressesTestCase(TestCase):
         Test unable to update address in agent profile when other entries have the same address and management start date
         """
         response = self.client.put(
-            f"/profiles/{self.agent_profile.id}/addresses/{self.profileAddressEntry2.id}/",
+            f"/profiles/{self.agent_profile.id}/addresses/{self.profile_address_entry2.id}/",
             {
                 "display_address": "2/345 Mary Road, New Suburb VIC 1100",
                 "unit_number": "2",
@@ -488,7 +494,7 @@ class ProfilesAddressesTestCase(TestCase):
         Test unable to update address in tenant profile when other entries have the same address and move in date
         """
         response = self.client.put(
-            f"/profiles/{self.tenant_profile.id}/addresses/{self.profileAddressEntry3.id}/",
+            f"/profiles/{self.tenant_profile.id}/addresses/{self.profile_address_entry3.id}/",
             {
                 "display_address": "2/345 Mary Road, New Suburb VIC 1100",
                 "unit_number": "2",
@@ -510,12 +516,12 @@ class ProfilesAddressesTestCase(TestCase):
         Test delete address in current profile
         """
         response = self.client.delete(
-            f"/profiles/{self.landlord_profile.id}/addresses/{self.profileAddressEntry1.id}/",
+            f"/profiles/{self.landlord_profile.id}/addresses/{self.profile_address_entry1.id}/",
         ).render()
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertFalse(
-            ProfilesAddresses.objects.filter(pk=self.profileAddressEntry1.id).exists()
+            ProfilesAddresses.objects.filter(pk=self.profile_address_entry1.id).exists()
         )
 
 
