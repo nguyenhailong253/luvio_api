@@ -1,20 +1,11 @@
-import logging
-
 from django.shortcuts import get_object_or_404
-from rest_framework import exceptions, status
+from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from luvio_api.common.constants import DEFAULT_LOGGER
-from luvio_api.common.domain_api_utils import (
-    get_or_create_address,
-    get_or_create_suburb,
-)
-from luvio_api.models import Address, ProfilesAddresses, StateAndTerritory, UserProfile
-from luvio_api.serializers import ProfilesAddressesSerializer
-
-logger = logging.getLogger(DEFAULT_LOGGER)
+from luvio_api.models import ProfilesAddresses
+from luvio_api.serializers import ProfilesAddressesCreateOrUpdateSerializer
 
 
 class ProfilesAddressesListView(APIView):
@@ -22,28 +13,9 @@ class ProfilesAddressesListView(APIView):
         """
         Link a new address to the current profile
         """
-        state = get_state(request.data)
-        address = get_address_from_payload(request.data, state)
-        profile_type = get_object_or_404(UserProfile, pk=profile_id).profile_type
-
-        data = self._construct_new_profile_address(
-            profile_id, address, request.data, profile_type.id
+        serializer = ProfilesAddressesCreateOrUpdateSerializer(
+            data={**request.data, "profile_id": profile_id}
         )
-
-        if self._has_duplicated_address_in_profile(
-            profile_id, address, data, profile_type.profile_type
-        ):
-            logger.error(
-                f"Duplicated address and start date in the same profile. Profile id: {profile_id}"
-            )
-            return Response(
-                {
-                    "message": "You cannot have the same address with the same start date more than once within one profile"
-                },
-                status=status.HTTP_409_CONFLICT,
-            )
-
-        serializer = ProfilesAddressesSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         record = serializer.save()
         return Response(
@@ -54,43 +26,6 @@ class ProfilesAddressesListView(APIView):
             status=status.HTTP_201_CREATED,
         )
 
-    def _construct_new_profile_address(
-        self, profile_id: int, address: Address, payload: dict, profile_type_id: str
-    ) -> dict:
-        return {
-            "profile": profile_id,
-            "address": address.id,
-            "profile_type": profile_type_id,
-            "move_in_date": payload.get("move_in_date", None),
-            "move_out_date": payload.get("move_out_date", None),
-            "management_start_date": payload.get("management_start_date", None),
-            "management_end_date": payload.get("management_end_date", None),
-            "ownership_start_date": payload.get("ownership_start_date", None),
-            "ownership_end_date": payload.get("ownership_end_date", None),
-            "is_current_residence": payload.get("is_current_residence", False),
-        }
-
-    def _has_duplicated_address_in_profile(
-        self, profile_id: int, address: Address, data: dict, profile_type_name: str
-    ) -> bool:
-        if profile_type_name == "tenant":
-            return ProfilesAddresses.objects.filter(
-                profile=profile_id, address=address, move_in_date=data["move_in_date"]
-            ).exists()
-        if profile_type_name == "agent":
-            return ProfilesAddresses.objects.filter(
-                profile=profile_id,
-                address=address,
-                management_start_date=data["management_start_date"],
-            ).exists()
-        if profile_type_name == "landlord":
-            return ProfilesAddresses.objects.filter(
-                profile=profile_id,
-                address=address,
-                ownership_start_date=data["ownership_start_date"],
-            ).exists()
-        raise exceptions.ValidationError({"message": "Invalid profile type!"})
-
 
 class ProfilesAddressesDetailView(APIView):
     def put(
@@ -99,25 +34,16 @@ class ProfilesAddressesDetailView(APIView):
         """
         Update exisitng address on current profile
         """
-        state = get_state(request.data)
-        address = get_address_from_payload(request.data, state)
-
         profile_address = get_object_or_404(
             ProfilesAddresses, pk=profile_address_id, profile=profile_id
         )
-        self._update_profile_address(profile_address, request.data, address)
-
-        if self._has_duplicated_address_in_profile(profile_address):
-            logger.error(
-                f"Duplicated address and start date in the same profile. Profile id: {profile_id}, profile address id: {profile_address_id}"
-            )
-            return Response(
-                {
-                    "message": "You cannot have the same address with the same start date more than once within one profile"
-                },
-                status=status.HTTP_409_CONFLICT,
-            )
-        profile_address.save()
+        serializer = ProfilesAddressesCreateOrUpdateSerializer(
+            profile_address,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response({"message": "Successfully updated address in current profile"})
 
     def delete(
@@ -130,72 +56,3 @@ class ProfilesAddressesDetailView(APIView):
             ProfilesAddresses, pk=profile_address_id, profile=profile_id
         ).delete()
         return Response({"message": "Successfully deleted address in current profile"})
-
-    def _has_duplicated_address_in_profile(
-        self, profile_address: ProfilesAddresses
-    ) -> bool:
-        if profile_address.profile_type.profile_type == "tenant":
-            return (
-                ProfilesAddresses.objects.filter(
-                    profile=profile_address.profile,
-                    address=profile_address.address,
-                    move_in_date=profile_address.move_in_date,
-                )
-                .exclude(pk=profile_address.id)
-                .exists()
-            )
-        if profile_address.profile_type.profile_type == "agent":
-            return (
-                ProfilesAddresses.objects.filter(
-                    profile=profile_address.profile,
-                    address=profile_address.address,
-                    management_start_date=profile_address.management_start_date,
-                )
-                .exclude(pk=profile_address.id)
-                .exists()
-            )
-        if profile_address.profile_type.profile_type == "landlord":
-            return (
-                ProfilesAddresses.objects.filter(
-                    profile=profile_address.profile,
-                    address=profile_address.address,
-                    ownership_start_date=profile_address.ownership_start_date,
-                )
-                .exclude(pk=profile_address.id)
-                .exists()
-            )
-        raise exceptions.ValidationError({"message": "Invalid profile type!"})
-
-    def _update_profile_address(
-        self, profile_address: ProfilesAddresses, payload: dict, address: Address
-    ):
-        profile_address.address = address
-        profile_address.is_current_residence = payload.get(
-            "is_current_residence",
-            False,
-        )
-        if profile_address.profile_type.profile_type == "tenant":
-            profile_address.move_in_date = payload.get("move_in_date", None)
-            profile_address.move_out_date = payload.get("move_out_date", None)
-        if profile_address.profile_type.profile_type == "agent":
-            profile_address.management_start_date = payload.get(
-                "management_start_date", None
-            )
-            profile_address.management_end_date = payload.get(
-                "management_end_date", None
-            )
-        if profile_address.profile_type.profile_type == "landlord":
-            profile_address.ownership_start_date = payload.get(
-                "ownership_start_date", None
-            )
-            profile_address.ownership_end_date = payload.get("ownership_end_date", None)
-
-
-def get_state(payload: dict) -> StateAndTerritory:
-    return StateAndTerritory.objects.get(state_code=payload["state"])
-
-
-def get_address_from_payload(payload: dict, state: StateAndTerritory) -> Address:
-    suburb = get_or_create_suburb(payload, state)
-    address = get_or_create_address(payload, suburb)
-    return address
