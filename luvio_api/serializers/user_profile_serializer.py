@@ -3,7 +3,7 @@ import logging
 from rest_framework import serializers, status
 
 from luvio_api.common.constants import DEFAULT_LOGGER
-from luvio_api.models import UserProfile
+from luvio_api.models import ProfileType, UserAccount, UserProfile
 from luvio_api.serializers import AddressGetFullDetailSerializer
 
 logger = logging.getLogger(DEFAULT_LOGGER)
@@ -14,23 +14,30 @@ class UserProfileCreateOrUpdateSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = "__all__"
 
-    def create(self, validated_data: dict) -> UserProfile:
+    def is_account_already_has_profile(
+        self, account: UserAccount, profile_type: ProfileType
+    ):
         if UserProfile.objects.filter(
-            profile_type=validated_data.get("profile_type"),
-            account=validated_data.get("account"),
+            profile_type=profile_type,
+            account=account,
         ).exists():
             logger.error(
-                f"Failed to create a new profile because this profile type already exists in this account. Username = {validated_data.get('account')}"
+                f"Failed to create a new profile because this profile type already exists in this account. Username = {account}"
             )
             res = serializers.ValidationError(
                 {
-                    "message": f"This account already has a profile with {validated_data.get('profile_type')} profile type"
+                    "message": f"This account already has a profile with {profile_type} profile type"
                 },
             )
             res.status_code = (
                 status.HTTP_409_CONFLICT
             )  # Ref: https://stackoverflow.com/a/63211074/8749888
             raise res
+
+    def create(self, validated_data: dict) -> UserProfile:
+        self.is_account_already_has_profile(
+            validated_data.get("account"), validated_data.get("profile_type")  # type: ignore[arg-type]
+        )
         return UserProfile.objects.create(**validated_data)
 
     def update(self, instance: UserProfile, validated_data: dict) -> UserProfile:
