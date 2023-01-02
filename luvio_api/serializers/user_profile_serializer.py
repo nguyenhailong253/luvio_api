@@ -66,11 +66,30 @@ class UserProfileListSerializer(serializers.ModelSerializer):
 
 
 class UserProfileGetFullDetailSerializer(serializers.ModelSerializer):
-    addresses = AddressGetFullDetailSerializer(many=True, read_only=True)
+    addresses = serializers.SerializerMethodField()
     profile_type = serializers.SerializerMethodField()
 
     def get_profile_type(self, profile: UserProfile) -> str:
         return profile.profile_type.profile_type
+
+    def get_addresses(self, profile: UserProfile) -> list:
+        # Ref: https://stackoverflow.com/a/6019587/8749888
+        profilesaddresses = profile.profilesaddresses_set.all()
+        addresses = AddressGetFullDetailSerializer(
+            [pa.address for pa in profilesaddresses], many=True, read_only=True
+        ).data
+        for index in range(0, len(addresses)):
+            address = addresses[index]
+            profileaddress = profilesaddresses[index]
+            address["ownership_start_date"] = profileaddress.ownership_start_date
+            address["ownership_end_date"] = profileaddress.ownership_end_date
+            address["move_in_date"] = profileaddress.move_in_date
+            address["move_out_date"] = profileaddress.move_out_date
+            address["management_start_date"] = profileaddress.management_start_date
+            address["management_end_date"] = profileaddress.management_end_date
+            address["is_current_residence"] = profileaddress.is_current_residence
+            address["profile_address_relation_id"] = profileaddress.id
+        return addresses
 
     class Meta:
         model = UserProfile
