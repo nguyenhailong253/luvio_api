@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from luvio_api.common.constants import DEFAULT_LOGGER
 from luvio_api.models import UserAccount, UserProfile
 from luvio_api.serializers import (
-    UserProfileCreateSerializer,
+    UserProfileCreateOrUpdateSerializer,
     UserProfileGetFullDetailSerializer,
     UserProfileListSerializer,
 )
@@ -52,7 +52,7 @@ class UserProfileListView(APIView):
             "account": current_user.id,
         }
 
-        serializer = UserProfileCreateSerializer(data=data)
+        serializer = UserProfileCreateOrUpdateSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         profile = serializer.save()
         return Response(
@@ -83,9 +83,11 @@ class UserProfileDetailView(APIView):
         Update an existing profile
         """
         profile = self._get_profile(profile_id, request.user)
-        profile.avatar_link = request.data.get("avatar_link", None)
-        profile.profile_pitch = request.data.get("profile_pitch", None)
-        profile.save()
+        serializer = UserProfileCreateOrUpdateSerializer(
+            profile, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(
             {
                 "message": "Successfully updated profile!",
