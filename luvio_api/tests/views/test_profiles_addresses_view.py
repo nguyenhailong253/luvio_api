@@ -4,7 +4,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from luvio_api.common.constants import PROFILE_TYPES
+from luvio_api.common.constants import DATE_FORMAT, PROFILE_TYPES
 from luvio_api.models import (
     Address,
     ProfilesAddresses,
@@ -361,11 +361,11 @@ class ProfilesAddressesTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            profile_address.ownership_start_date.strftime("%Y-%m-%d"),
+            profile_address.ownership_start_date.strftime(DATE_FORMAT),
             "2022-12-31",
         )
         self.assertEqual(
-            profile_address.ownership_end_date.strftime("%Y-%m-%d"),
+            profile_address.ownership_end_date.strftime(DATE_FORMAT),
             "2023-12-31",
         )
         self.assertEqual(profile_address.address, self.address2)
@@ -397,11 +397,11 @@ class ProfilesAddressesTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            profile_address.management_start_date.strftime("%Y-%m-%d"),
+            profile_address.management_start_date.strftime(DATE_FORMAT),
             "2022-12-31",
         )
         self.assertEqual(
-            profile_address.management_end_date.strftime("%Y-%m-%d"),
+            profile_address.management_end_date.strftime(DATE_FORMAT),
             "2023-12-31",
         )
         self.assertEqual(profile_address.address, self.address2)
@@ -432,7 +432,7 @@ class ProfilesAddressesTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            profile_address.move_in_date.strftime("%Y-%m-%d"),
+            profile_address.move_in_date.strftime(DATE_FORMAT),
             "2022-12-31",
         )
         self.assertEqual(profile_address.move_out_date, None)

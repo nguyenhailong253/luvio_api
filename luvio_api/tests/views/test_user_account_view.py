@@ -4,6 +4,7 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from luvio_api.common.constants import DATE_FORMAT
 from luvio_api.models import UserAccount
 
 
@@ -60,7 +61,7 @@ class UserAccountTestCase(TestCase):
         self.assertEqual(updated_user.username, "default_user_updated")
         self.assertEqual(updated_user.first_name, "default_fn_updated")
         self.assertEqual(updated_user.last_name, "default_ln_updated")
-        self.assertEqual(updated_user.date_of_birth.strftime("%Y-%m-%d"), "2022-01-02")
+        self.assertEqual(updated_user.date_of_birth.strftime(DATE_FORMAT), "2022-01-02")
         self.assertEqual(updated_user.mobile, "0412345678")
 
     def test_update_user_non_unique_username(self):
