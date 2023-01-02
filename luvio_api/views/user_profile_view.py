@@ -1,20 +1,15 @@
-import logging
-
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from luvio_api.common.constants import DEFAULT_LOGGER
 from luvio_api.models import UserAccount, UserProfile
 from luvio_api.serializers import (
     UserProfileCreateOrUpdateSerializer,
     UserProfileGetFullDetailSerializer,
     UserProfileListSerializer,
 )
-
-logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class UserProfileListView(APIView):
@@ -31,28 +26,9 @@ class UserProfileListView(APIView):
         """
         Create a new profile for the logged in account
         """
-        current_user = request.user
-        if UserProfile.objects.filter(
-            profile_type=request.data.get("profile_type"), account=current_user
-        ).exists():
-            logger.error(
-                f"Failed to create a new profile because this profile type already exists in this account. User '{current_user}'"
-            )
-            return Response(
-                {
-                    "message": "This account already has a profile with this profile type"
-                },
-                status=status.HTTP_409_CONFLICT,
-            )
-        data = {
-            "avatar_link": request.data.get("avatar_link", None),
-            "profile_pitch": request.data.get("profile_pitch", None),
-            "profile_type": request.data.get("profile_type"),
-            "profile_url": request.data.get("profile_url", None),
-            "account": current_user.id,
-        }
-
-        serializer = UserProfileCreateOrUpdateSerializer(data=data)
+        serializer = UserProfileCreateOrUpdateSerializer(
+            data={**request.data, "account": request.user.id}
+        )
         serializer.is_valid(raise_exception=True)
         profile = serializer.save()
         return Response(
@@ -63,10 +39,6 @@ class UserProfileListView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
-
-    def _generate_profile_url(self):
-        pass
-        # TODO: implement url generation (unique for each profile)
 
 
 class UserProfileDetailView(APIView):
