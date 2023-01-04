@@ -7,6 +7,10 @@ from luvio_api.serializers import ProfileTypeSerializer
 
 
 class ProfileTypeView(APIView):
+    """
+    Handling requests to profile-type endpoints
+    """
+
     def get(self, request: Request) -> Response:
         """
         Get all account profile types

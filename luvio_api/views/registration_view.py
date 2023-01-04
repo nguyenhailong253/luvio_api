@@ -9,6 +9,10 @@ from luvio_api.serializers import UserAccountSerializer
 
 
 class RegistrationView(APIView):
+    """
+    Public endpoint (no authentication required) allowing user account registration
+    """
+
     permission_classes = [AllowAny]
 
     def post(self, request: Request) -> Response:

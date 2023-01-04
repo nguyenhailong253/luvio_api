@@ -10,6 +10,10 @@ logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class UserProfileCreateOrUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer specifically for create/update flows of a profile
+    """
+
     class Meta:
         model = UserProfile
         fields = "__all__"
@@ -59,6 +63,10 @@ class UserProfileCreateOrUpdateSerializer(serializers.ModelSerializer):
 
 
 class UserProfileListSerializer(serializers.ModelSerializer):
+    """
+    Custom serializer for fetching list of profiles
+    """
+
     profile_type = serializers.SerializerMethodField()
 
     def get_profile_type(self, profile: UserProfile) -> str:
@@ -80,6 +88,11 @@ class UserProfileListSerializer(serializers.ModelSerializer):
 
 
 class UserProfileGetFullDetailSerializer(serializers.ModelSerializer):
+    """
+    Custom serializer for getting full details of a single profile
+    Including full list of serialized addresses, and employment details, etc
+    """
+
     addresses = serializers.SerializerMethodField()
     profile_type = serializers.SerializerMethodField()
 

@@ -4,6 +4,10 @@ from luvio_api.models import Address
 
 
 class AddressGetFullDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for when we want human-readable address (replace foreign keys with actual text)
+    """
+
     postcode = serializers.SerializerMethodField()
     suburb = serializers.SerializerMethodField()
     state = serializers.SerializerMethodField()

@@ -9,6 +9,11 @@ from luvio_api.serializers import ProfilesAddressesCreateOrUpdateSerializer
 
 
 class ProfilesAddressesListView(APIView):
+    """
+    Handling only create new link between an address and profile
+    Might include a GET list later
+    """
+
     def post(self, request: Request, profile_id: int) -> Response:
         """
         Link a new address to the current profile
@@ -28,6 +33,10 @@ class ProfilesAddressesListView(APIView):
 
 
 class ProfilesAddressesDetailView(APIView):
+    """
+    Handling update or delete of profile-address relationship
+    """
+
     def put(
         self, request: Request, profile_id: int, profile_address_id: int
     ) -> Response:

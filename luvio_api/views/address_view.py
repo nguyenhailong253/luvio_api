@@ -14,6 +14,10 @@ logger = logging.getLogger(DEFAULT_LOGGER)
 
 @api_view(["GET"])
 def get_address_suggestions(request: Request) -> Response:
+    """
+    Handling GET requests for address suggestions using a search term
+    Outsourcing to Domain API instead of implementing our own for now
+    """
     # query param for search term should already be urlencoded from the front end
     search_term = request.query_params.get("term", None)
     if search_term:

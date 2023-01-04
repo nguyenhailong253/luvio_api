@@ -7,6 +7,11 @@ from luvio_api.models import Address, ProfileType, UserAccount
 
 
 class UserProfile(models.Model):
+    """
+    ManyToOne relationship with UserAccount - Each account can have multiple profiles (max 3 at the moment)
+    ManyToOne relationship with ProfileType - There are multiple profiles of the same type
+    """
+
     # Ref: https://docs.djangoproject.com/en/4.0/ref/models/fields/#django.db.models.ForeignKey.to_field
     # by default, use primary key of related object
     account = models.ForeignKey(UserAccount, on_delete=models.CASCADE)

@@ -4,6 +4,10 @@ from luvio_api.models import Address, ProfileType, UserProfile
 
 
 class ProfilesAddresses(models.Model):
+    """
+    Class representing joint table between UserProfile and Address (ManyToMany relationship)
+    """
+
     profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
     profile_type = models.ForeignKey(ProfileType, on_delete=models.CASCADE)

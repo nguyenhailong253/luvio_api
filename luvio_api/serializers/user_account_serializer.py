@@ -4,6 +4,10 @@ from luvio_api.models import UserAccount
 
 
 class UserAccountSerializer(serializers.ModelSerializer):
+    """
+    Custom implementation for create and update user accounts
+    """
+
     class Meta:
         model = UserAccount
         fields = "__all__"
