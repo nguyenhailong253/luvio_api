@@ -67,7 +67,7 @@ class ProfilesAddressesTestCase(TestCase):
             account=cls.default_user,
         )
 
-        # Create address
+        # Create addresses
         cls.state = StateAndTerritory.objects.create(
             state_code="VIC", name="Victoria", country="Australia"
         )

@@ -12,6 +12,10 @@ from luvio_api.common.constants import (
 
 
 class UserAccount(AbstractUser):
+    """
+    A core class - each user needs to have an account to access the system
+    """
+
     # Ref: https://stackoverflow.com/questions/22586897/creating-custom-fields-with-django-allauth
     # Ref: https://stackoverflow.com/a/59310643
     REQUIRED_FIELDS = (

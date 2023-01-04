@@ -31,6 +31,9 @@ class DomainApiClient:
         self._set_access_token()
 
     def _set_access_token(self):
+        """
+        Try to find access token from env var, if not found then refresh token
+        """
         try:
             self.access_token = env("DOMAIN_API_TOKEN")
         except ImproperlyConfigured as e:
@@ -38,6 +41,9 @@ class DomainApiClient:
             self._refresh_token()
 
     def _refresh_token(self):
+        """
+        Use client ID and secret from Domain API to retrieve token
+        """
         client_id = env("DOMAIN_API_CLIENT_ID")
         client_secrets = env("DOMAIN_API_CLIENT_SECRET")
         req_body = {
@@ -55,12 +61,18 @@ class DomainApiClient:
         self.access_token = response.json()["access_token"]
 
     def _get(self, url: str) -> Iterable[Any]:
+        """
+        Send a GET request to Domain API with token
+        """
         headers = {"Authorization": f"Bearer {self.access_token}"}
         response = requests.get(url, headers=headers, timeout=TIMEOUT)
         response.raise_for_status()
         return response.json()
 
     def _make_get_request(self, url: str):
+        """
+        Try to make a GET request, if fail with 401 code, refresh token and try again
+        """
         try:
             return self._get(url)
         except HTTPError as e:
@@ -73,6 +85,10 @@ class DomainApiClient:
                 raise e
 
     def get_address_suggestions(self, search_term_url_encoded: str) -> Iterable[Any]:
+        """
+        Call address suggestion endpoint from Domain API to get a list of potentially
+        matching addresses based on a search term
+        """
         url = f"{DOMAIN_API_PROPERTIES_URL}/_suggest?terms={search_term_url_encoded}&channel=All"
         return convert_address_suggestion_fields_to_snake_case(
             self._make_get_request(url)

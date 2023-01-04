@@ -15,9 +15,17 @@ logger = logging.getLogger(DEFAULT_LOGGER)
 
 
 class LoginView(ObtainAuthToken):
+    """
+    Handling user logging in and token generation
+    """
+
     permission_classes = [AllowAny]
 
     def post(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Accept both email or username (eventually convert both to username) and password
+        for authentication
+        """
         payload = request.data
         password = payload.get("password", None)
         username = self._get_username(payload)

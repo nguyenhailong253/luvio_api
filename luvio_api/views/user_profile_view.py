@@ -13,6 +13,10 @@ from luvio_api.serializers import (
 
 
 class UserProfileListView(APIView):
+    """
+    Handle getting a list of profiles or create a new profile
+    """
+
     def get(self, request: Request) -> Response:
         """
         Get existing profiles of the logged in account
@@ -42,6 +46,10 @@ class UserProfileListView(APIView):
 
 
 class UserProfileDetailView(APIView):
+    """
+    Handle get single profile, update and delete a profile
+    """
+
     def get(self, request: Request, profile_id: int) -> Response:
         """
         Get existing profile of the logged in account based on profile id

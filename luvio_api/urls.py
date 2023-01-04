@@ -20,12 +20,15 @@ from luvio_api import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # AUTHENTICATION
     path("login/", views.LoginView.as_view(), name="login"),
     path("registration/", views.RegistrationView.as_view(), name="registration"),
     # Ref: https://stackoverflow.com/a/9744268/8749888 - end slash
     # Ref: https://stackoverflow.com/a/51922669/8749888 - name attribute
+    # ACCOUNTS
     path("accounts/password/", views.change_password, name="change-password"),
     path("accounts/", views.UserAccountView.as_view(), name="accounts"),
+    # PROFILES
     path(
         "profiles/<int:profile_id>/",
         views.UserProfileDetailView.as_view(),
@@ -42,7 +45,9 @@ urlpatterns = [
         views.ProfilesAddressesDetailView.as_view(),
         name="profiles-addresses-detail",
     ),
+    # PROFILE TYPES
     path("profile-types/", views.ProfileTypeView.as_view(), name="profile-types"),
+    # ADDRESS SUGGESTIONS
     path(
         "addresses/suggestions/",
         views.get_address_suggestions,

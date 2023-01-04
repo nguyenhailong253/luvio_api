@@ -4,6 +4,10 @@ from luvio_api.models import Suburb
 
 
 class Address(models.Model):
+    """
+    A physical address
+    """
+
     # OneToOne vs ForeighKey (aka ManyToOne) https://stackoverflow.com/a/26937468/8749888
     suburb = models.ForeignKey(Suburb, on_delete=models.CASCADE)
     display_address = models.CharField(max_length=320)

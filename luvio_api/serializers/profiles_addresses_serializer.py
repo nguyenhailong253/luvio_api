@@ -47,6 +47,7 @@ class ProfilesAddressesCreateOrUpdateSerializer(serializers.Serializer):
             name=payload.pop("suburb"),
             postcode=payload.pop("postcode"),
         )
+        logger.info(f"Suburb created? {created}: {suburb}")
         address, created = Address.objects.get_or_create(
             suburb=suburb,
             display_address=payload.pop("display_address"),
@@ -56,7 +57,7 @@ class ProfilesAddressesCreateOrUpdateSerializer(serializers.Serializer):
             street_type=payload.pop("street_type"),
             street_type_abbrev=payload.pop("street_type_abbrev"),
         )
-        print(f"Created: {created}")
+        logger.info(f"Address created? {created}: {address}")
         return address
 
     def _raise_conflict_error(self):
