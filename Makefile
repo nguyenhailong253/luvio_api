@@ -8,7 +8,8 @@ migrate:
 
 test:
 	# Ref: https://stackoverflow.com/a/42862546/8749888 -- config for running in parallel
-	pipenv run python -m coverage run -m manage test --noinput --verbosity 2
+	pipenv run python -m coverage run --concurrency=multiprocessing -m manage test --noinput --verbosity 2 --parallel
+	pipenv run python -m coverage combine
 	pipenv run python -m coverage report
 
 format:
