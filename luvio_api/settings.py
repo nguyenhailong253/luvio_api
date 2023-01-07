@@ -55,6 +55,12 @@ REST_FRAMEWORK = {
     # Ref: https://docs.djangoproject.com/en/3.2/ref/settings/#date-input-formats
     "DATE_INPUT_FORMATS": ["%Y-%m-%d"],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "500/day",
+    },
 }
 
 AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
