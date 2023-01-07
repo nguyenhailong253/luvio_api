@@ -17,3 +17,7 @@ API for Luvio app
 
 ## Folder structure
 - [Best Practice](https://stackoverflow.com/a/23469321/8749888)
+
+# Django Managers
+- [Django Managers - docs](https://docs.djangoproject.com/en/4.1/topics/db/managers/)
+- [What is django model manager](https://buildatscale.tech/what-is-django-model-manager/)
