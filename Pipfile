@@ -10,6 +10,9 @@ psycopg2-binary = "*"
 django-environ = "*"
 bcrypt = "*"
 requests = "*"
+django-storages = "*"
+boto3 = "*"
+pillow = "*"
 
 [dev-packages]
 pylint = "*"

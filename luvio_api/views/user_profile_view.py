@@ -30,9 +30,8 @@ class UserProfileListView(APIView):
         """
         Create a new profile for the logged in account
         """
-        serializer = UserProfileCreateOrUpdateSerializer(
-            data={**request.data, "account": request.user.id}
-        )
+        request.data["account"] = request.user.id
+        serializer = UserProfileCreateOrUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         profile = serializer.save()
         return Response(

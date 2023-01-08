@@ -16,8 +16,9 @@ class UserProfile(models.Model):
     # by default, use primary key of related object
     account = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     profile_type = models.ForeignKey(ProfileType, on_delete=models.CASCADE)
-    avatar_link = models.CharField(
-        max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True, default=None
+    # Ref: https://stackoverflow.com/a/64245514/8749888
+    avatar = models.ImageField(
+        upload_to="avatars/", default="avatars/default.jpg", blank=True
     )
     profile_pitch = models.CharField(
         max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True, default=None

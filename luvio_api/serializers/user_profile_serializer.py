@@ -56,7 +56,7 @@ class UserProfileCreateOrUpdateSerializer(serializers.ModelSerializer):
         """
         Update an existing profile - but we can only update 2 fields currently
         """
-        instance.avatar_link = validated_data.get("avatar_link", None)
+        instance.avatar = validated_data.get("avatar", instance.avatar)
         instance.profile_pitch = validated_data.get("profile_pitch", None)
         instance.save()
         return instance
@@ -79,7 +79,7 @@ class UserProfileListSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = [
             "id",
-            "avatar_link",
+            "avatar",
             "profile_pitch",
             "profile_url",
             "date_created",
@@ -130,7 +130,7 @@ class UserProfileGetFullDetailSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = [
             "profile_type",
-            "avatar_link",
+            "avatar",
             "profile_pitch",
             "profile_url",
             "date_created",
