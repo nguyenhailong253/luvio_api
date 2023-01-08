@@ -7,3 +7,5 @@ from .user_profile_serializer import (
     UserProfileGetFullDetailSerializer,
     UserProfileListSerializer,
 )
+
+from .public_user_profile_serializer import PublicUserProfileSerializer

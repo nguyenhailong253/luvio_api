@@ -1,11 +1,13 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status
+from rest_framework.decorators import api_view
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from luvio_api.models import UserAccount, UserProfile
 from luvio_api.serializers import (
+    PublicUserProfileSerializer,
     UserProfileCreateOrUpdateSerializer,
     UserProfileGetFullDetailSerializer,
     UserProfileListSerializer,
@@ -37,7 +39,7 @@ class UserProfileListView(APIView):
         return Response(
             {
                 "message": "Successfully created profile!",
-                "profile_url": profile.profile_url,
+                "profile_uri": profile.profile_uri,
                 "profile_id": profile.id,
             },
             status=status.HTTP_201_CREATED,
@@ -86,3 +88,13 @@ class UserProfileDetailView(APIView):
 
     def _get_profile(self, profile_id: int, account: UserAccount) -> UserProfile:
         return get_object_or_404(UserProfile, pk=profile_id, account=account)
+
+
+@api_view(["GET"])
+def get_public_profile(request: Request, profile_uri: str) -> Response:
+    """
+    Get public user profile using profile uri
+    """
+    profile = get_object_or_404(UserProfile, profile_uri=profile_uri)
+    serializer = PublicUserProfileSerializer(profile)
+    return Response(serializer.data)

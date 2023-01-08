@@ -49,21 +49,21 @@ class ProfilesAddressesTestCase(TestCase):
             avatar="https://img.com",
             profile_pitch="Hi I'm a well known landlord",
             profile_type=cls.landlord_profile_type,
-            profile_url="landlord.com/profile",
+            profile_uri="landlord.com/profile",
             account=cls.default_user,
         )
         cls.agent_profile = UserProfile.objects.create(
             avatar="https://img.com",
             profile_pitch="Hi I'm a well known agent",
             profile_type=cls.agent_profile_type,
-            profile_url="agent.com/profile",
+            profile_uri="agent.com/profile",
             account=cls.default_user,
         )
         cls.tenant_profile = UserProfile.objects.create(
             avatar="https://img.com",
             profile_pitch="Hi I'm a well known tenant",
             profile_type=cls.tenant_profile_type,
-            profile_url="tenant.com/profile",
+            profile_uri="tenant.com/profile",
             account=cls.default_user,
         )
 

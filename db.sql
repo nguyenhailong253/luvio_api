@@ -27,7 +27,7 @@ create table if not exists application.user_profiles (
     profile_type bigserial NOT NULL,
     avatar text,
     profile_pitch text,
-    profile_url text NOT NULL
+    profile_uri text NOT NULL
 )
 
 -- Relationships:

@@ -43,7 +43,7 @@ class UserProfileTestCase(TestCase):
             avatar="img.jpg",
             profile_pitch="Hi I'm a well known agent",
             profile_type=cls.agent_profile_type,
-            profile_url="agenturl",
+            profile_uri="agenturl",
             account=cls.default_user,
         )
 
@@ -52,7 +52,7 @@ class UserProfileTestCase(TestCase):
             avatar="img.jpg",
             profile_pitch="Hi I'm a well known tenant",
             profile_type=cls.tenant_profile_type,
-            profile_url="tenanturl",
+            profile_uri="tenanturl",
             account=cls.default_user,
         )
 
@@ -119,7 +119,7 @@ class UserProfileTestCase(TestCase):
                 "id": self.agent_profile.id,
                 "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
                 "profile_pitch": "Hi I'm a well known agent",
-                "profile_url": "agenturl",
+                "profile_uri": "agenturl",
                 "date_created": self.agent_profile.date_created,
                 "profile_type": "agent",
             },
@@ -127,7 +127,7 @@ class UserProfileTestCase(TestCase):
                 "id": self.tenant_profile.id,
                 "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
                 "profile_pitch": "Hi I'm a well known tenant",
-                "profile_url": "tenanturl",
+                "profile_uri": "tenanturl",
                 "date_created": self.tenant_profile.date_created,
                 "profile_type": "tenant",
             },
@@ -144,7 +144,7 @@ class UserProfileTestCase(TestCase):
         expected_response = {
             "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
             "profile_pitch": "Hi I'm a well known tenant",
-            "profile_url": "tenanturl",
+            "profile_uri": "tenanturl",
             "date_created": self.tenant_profile.date_created,
             "profile_type": "tenant",
             "addresses": [
@@ -224,15 +224,35 @@ class UserProfileTestCase(TestCase):
                     "avatar": img,
                     "profile_pitch": "This is a test profile",
                     "profile_type": self.landlord_profile_type.id,
-                    "profile_url": "url",
+                    "profile_uri": "url",
                 },
                 format="multipart",
             ).render()
 
             creatd_profile = UserProfile.objects.get(pk=response.data["profile_id"])
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(response.data["profile_id"], creatd_profile.id)
+            self.assertEqual(
+                response.data["profile_uri"],
+                f"{self.default_user.username}-{creatd_profile.id}",
+            )
             self.assertEqual(creatd_profile.profile_pitch, "This is a test profile")
             self.assertTrue(creatd_profile.avatar)
+
+    def test_create_profile_with_duplicated_profile_uri(self):
+        """
+        Test unable to create a profile with duplicated profile uri
+        """
+        response = self.client.post(
+            "/profiles/",
+            {
+                "profile_pitch": "This is a test profile",
+                "profile_type": self.landlord_profile_type.id,
+                "profile_uri": "tenanturl",
+            },
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_already_exist_profile(self):
         """
@@ -245,7 +265,7 @@ class UserProfileTestCase(TestCase):
                     "avatar": img,
                     "profile_pitch": "This is a duplicated profile",
                     "profile_type": self.agent_profile_type.id,
-                    "profile_url": "testurl",
+                    "profile_uri": "testurl",
                 },
                 format="multipart",
             ).render()
@@ -262,6 +282,7 @@ class UserProfileTestCase(TestCase):
                 {
                     "avatar": img,
                     "profile_pitch": "An update on my tenant profile",
+                    "profile_uri": "unique-uri",
                 },
                 format="multipart",
             ).render()
@@ -277,6 +298,59 @@ class UserProfileTestCase(TestCase):
             self.assertEqual(
                 updated_profile.profile_pitch, "An update on my tenant profile"
             )
+            self.assertEqual(updated_profile.profile_uri, "unique-uri")
+
+    def test_update_profile_when_no_new_avatar(self):
+        """
+        Test update existing profile without new avatar, should not overwrite avatar link
+        """
+        response = self.client.put(
+            f"/profiles/{self.tenant_profile.id}/",
+            {
+                "profile_pitch": "An update on my tenant profile",
+                "profile_uri": "unique-uri",
+            },
+            format="multipart",
+        ).render()
+
+        updated_profile = UserProfile.objects.get(
+            profile_type=self.tenant_profile_type.id, account=self.default_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            "https://luvio-static-public.s3.amazonaws.com/img.jpg",
+            updated_profile.avatar.url,
+        )
+
+    def test_update_profile_with_duplicated_profile_uri(self):
+        """
+        Test unable to update a profile with duplicated profile uri
+        """
+        response = self.client.put(
+            f"/profiles/{self.tenant_profile.id}/",
+            {
+                "profile_uri": "agenturl",
+            },
+            format="multipart",
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_profile_when_no_profile_pitch(self):
+        """
+        Test update existing profile without profile pitch, should set it to None
+        """
+        response = self.client.put(
+            f"/profiles/{self.tenant_profile.id}/",
+            {"profile_uri": "unique-uri"},
+            format="multipart",
+        ).render()
+
+        updated_profile = UserProfile.objects.get(
+            profile_type=self.tenant_profile_type.id, account=self.default_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(updated_profile.profile_pitch)
 
     def test_delete_profile(self):
         """
@@ -294,6 +368,80 @@ class UserProfileTestCase(TestCase):
                 )
             ),
             0,
+        )
+
+    def test_get_public_profile(self):
+        """
+        Test get details of public profile
+        """
+        response = self.client.get(
+            f"/profiles/public/{self.tenant_profile.profile_uri}/"
+        ).render()
+        expected_response = {
+            "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
+            "profile_pitch": "Hi I'm a well known tenant",
+            "profile_type": "tenant",
+            "addresses": [
+                {
+                    "display_address": "789 Brian Boulevard, New Suburb VIC 1100",
+                    "unit_number": None,
+                    "street_number": "789",
+                    "street_name": "Brian",
+                    "street_type": "Boulevard",
+                    "street_type_abbrev": "Bvd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                    "move_in_date": self.profile_address_entry1.move_in_date,
+                    "move_out_date": None,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": True,
+                },
+                {
+                    "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                    "unit_number": "2",
+                    "street_number": "345",
+                    "street_name": "Mary",
+                    "street_type": "Road",
+                    "street_type_abbrev": "Rd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                    "move_in_date": self.profile_address_entry2.move_in_date,
+                    "move_out_date": self.profile_address_entry2.move_out_date,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": False,
+                },
+                {
+                    "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                    "unit_number": "2",
+                    "street_number": "345",
+                    "street_name": "Mary",
+                    "street_type": "Road",
+                    "street_type_abbrev": "Rd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                    "move_in_date": self.profile_address_entry3.move_in_date,
+                    "move_out_date": self.profile_address_entry3.move_out_date,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": False,
+                },
+            ],
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            json.loads(json.dumps(response.data, default=str)), expected_response
         )
 
 

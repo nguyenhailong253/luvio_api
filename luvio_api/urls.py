@@ -36,6 +36,11 @@ urlpatterns = [
     ),
     path("profiles/", views.UserProfileListView.as_view(), name="profiles"),
     path(
+        "profiles/public/<str:profile_uri>/",
+        views.get_public_profile,
+        name="public-profile",
+    ),
+    path(
         "profiles/<int:profile_id>/addresses/",
         views.ProfilesAddressesListView.as_view(),
         name="profiles-addresses",
