@@ -9,7 +9,7 @@ from luvio_api.serializers import AddressGetFullDetailSerializer
 logger = logging.getLogger(DEFAULT_LOGGER)
 
 
-class PublicUserProfileDetailSerializer(serializers.ModelSerializer):
+class PublicUserProfileSerializer(serializers.ModelSerializer):
     """
     Custom serializer for getting full details of a profile which is publicly accessible
     Including full list of serialized addresses, and employment details, etc
@@ -45,7 +45,6 @@ class PublicUserProfileDetailSerializer(serializers.ModelSerializer):
             address["management_start_date"] = profileaddress.management_start_date
             address["management_end_date"] = profileaddress.management_end_date
             address["is_current_residence"] = profileaddress.is_current_residence
-            address["profile_address_relation_id"] = profileaddress.id
         return addresses
 
     class Meta:
@@ -54,7 +53,5 @@ class PublicUserProfileDetailSerializer(serializers.ModelSerializer):
             "profile_type",
             "avatar",
             "profile_pitch",
-            "profile_uri",
-            "date_created",
             "addresses",
         ]

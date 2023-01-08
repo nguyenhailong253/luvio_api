@@ -239,6 +239,21 @@ class UserProfileTestCase(TestCase):
             self.assertEqual(creatd_profile.profile_pitch, "This is a test profile")
             self.assertTrue(creatd_profile.avatar)
 
+    def test_create_profile_with_duplicated_profile_uri(self):
+        """
+        Test unable to create a profile with duplicated profile uri
+        """
+        response = self.client.post(
+            "/profiles/",
+            {
+                "profile_pitch": "This is a test profile",
+                "profile_type": self.landlord_profile_type.id,
+                "profile_uri": "tenanturl",
+            },
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_create_already_exist_profile(self):
         """
         Test create a profile which already exists
@@ -307,6 +322,20 @@ class UserProfileTestCase(TestCase):
             updated_profile.avatar.url,
         )
 
+    def test_update_profile_with_duplicated_profile_uri(self):
+        """
+        Test unable to update a profile with duplicated profile uri
+        """
+        response = self.client.put(
+            f"/profiles/{self.tenant_profile.id}/",
+            {
+                "profile_uri": "agenturl",
+            },
+            format="multipart",
+        ).render()
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_update_profile_when_no_profile_pitch(self):
         """
         Test update existing profile without profile pitch, should set it to None
@@ -339,6 +368,80 @@ class UserProfileTestCase(TestCase):
                 )
             ),
             0,
+        )
+
+    def test_get_public_profile(self):
+        """
+        Test get details of public profile
+        """
+        response = self.client.get(
+            f"/profiles/public/{self.tenant_profile.profile_uri}/"
+        ).render()
+        expected_response = {
+            "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
+            "profile_pitch": "Hi I'm a well known tenant",
+            "profile_type": "tenant",
+            "addresses": [
+                {
+                    "display_address": "789 Brian Boulevard, New Suburb VIC 1100",
+                    "unit_number": None,
+                    "street_number": "789",
+                    "street_name": "Brian",
+                    "street_type": "Boulevard",
+                    "street_type_abbrev": "Bvd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                    "move_in_date": self.profile_address_entry1.move_in_date,
+                    "move_out_date": None,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": True,
+                },
+                {
+                    "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                    "unit_number": "2",
+                    "street_number": "345",
+                    "street_name": "Mary",
+                    "street_type": "Road",
+                    "street_type_abbrev": "Rd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                    "move_in_date": self.profile_address_entry2.move_in_date,
+                    "move_out_date": self.profile_address_entry2.move_out_date,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": False,
+                },
+                {
+                    "display_address": "2/345 Mary Road, New Suburb VIC 1100",
+                    "unit_number": "2",
+                    "street_number": "345",
+                    "street_name": "Mary",
+                    "street_type": "Road",
+                    "street_type_abbrev": "Rd",
+                    "suburb": "New Suburb",
+                    "postcode": "1100",
+                    "state": "VIC",
+                    "move_in_date": self.profile_address_entry3.move_in_date,
+                    "move_out_date": self.profile_address_entry3.move_out_date,
+                    "management_start_date": None,
+                    "management_end_date": None,
+                    "ownership_start_date": None,
+                    "ownership_end_date": None,
+                    "is_current_residence": False,
+                },
+            ],
+        }
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            json.loads(json.dumps(response.data, default=str)), expected_response
         )
 
 
