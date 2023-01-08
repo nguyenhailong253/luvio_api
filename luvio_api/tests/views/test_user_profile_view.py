@@ -43,7 +43,7 @@ class UserProfileTestCase(TestCase):
             avatar="img.jpg",
             profile_pitch="Hi I'm a well known agent",
             profile_type=cls.agent_profile_type,
-            profile_url="agenturl",
+            profile_uri="agenturl",
             account=cls.default_user,
         )
 
@@ -52,7 +52,7 @@ class UserProfileTestCase(TestCase):
             avatar="img.jpg",
             profile_pitch="Hi I'm a well known tenant",
             profile_type=cls.tenant_profile_type,
-            profile_url="tenanturl",
+            profile_uri="tenanturl",
             account=cls.default_user,
         )
 
@@ -119,7 +119,7 @@ class UserProfileTestCase(TestCase):
                 "id": self.agent_profile.id,
                 "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
                 "profile_pitch": "Hi I'm a well known agent",
-                "profile_url": "agenturl",
+                "profile_uri": "agenturl",
                 "date_created": self.agent_profile.date_created,
                 "profile_type": "agent",
             },
@@ -127,7 +127,7 @@ class UserProfileTestCase(TestCase):
                 "id": self.tenant_profile.id,
                 "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
                 "profile_pitch": "Hi I'm a well known tenant",
-                "profile_url": "tenanturl",
+                "profile_uri": "tenanturl",
                 "date_created": self.tenant_profile.date_created,
                 "profile_type": "tenant",
             },
@@ -144,7 +144,7 @@ class UserProfileTestCase(TestCase):
         expected_response = {
             "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
             "profile_pitch": "Hi I'm a well known tenant",
-            "profile_url": "tenanturl",
+            "profile_uri": "tenanturl",
             "date_created": self.tenant_profile.date_created,
             "profile_type": "tenant",
             "addresses": [
@@ -224,13 +224,18 @@ class UserProfileTestCase(TestCase):
                     "avatar": img,
                     "profile_pitch": "This is a test profile",
                     "profile_type": self.landlord_profile_type.id,
-                    "profile_url": "url",
+                    "profile_uri": "url",
                 },
                 format="multipart",
             ).render()
 
             creatd_profile = UserProfile.objects.get(pk=response.data["profile_id"])
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(response.data["profile_id"], creatd_profile.id)
+            self.assertEqual(
+                response.data["profile_uri"],
+                f"{self.default_user.username}-{creatd_profile.id}",
+            )
             self.assertEqual(creatd_profile.profile_pitch, "This is a test profile")
             self.assertTrue(creatd_profile.avatar)
 
@@ -245,7 +250,7 @@ class UserProfileTestCase(TestCase):
                     "avatar": img,
                     "profile_pitch": "This is a duplicated profile",
                     "profile_type": self.agent_profile_type.id,
-                    "profile_url": "testurl",
+                    "profile_uri": "testurl",
                 },
                 format="multipart",
             ).render()
@@ -262,6 +267,7 @@ class UserProfileTestCase(TestCase):
                 {
                     "avatar": img,
                     "profile_pitch": "An update on my tenant profile",
+                    "profile_uri": "unique-uri",
                 },
                 format="multipart",
             ).render()
@@ -277,6 +283,45 @@ class UserProfileTestCase(TestCase):
             self.assertEqual(
                 updated_profile.profile_pitch, "An update on my tenant profile"
             )
+            self.assertEqual(updated_profile.profile_uri, "unique-uri")
+
+    def test_update_profile_when_no_new_avatar(self):
+        """
+        Test update existing profile without new avatar, should not overwrite avatar link
+        """
+        response = self.client.put(
+            f"/profiles/{self.tenant_profile.id}/",
+            {
+                "profile_pitch": "An update on my tenant profile",
+                "profile_uri": "unique-uri",
+            },
+            format="multipart",
+        ).render()
+
+        updated_profile = UserProfile.objects.get(
+            profile_type=self.tenant_profile_type.id, account=self.default_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            "https://luvio-static-public.s3.amazonaws.com/img.jpg",
+            updated_profile.avatar.url,
+        )
+
+    def test_update_profile_when_no_profile_pitch(self):
+        """
+        Test update existing profile without profile pitch, should set it to None
+        """
+        response = self.client.put(
+            f"/profiles/{self.tenant_profile.id}/",
+            {"profile_uri": "unique-uri"},
+            format="multipart",
+        ).render()
+
+        updated_profile = UserProfile.objects.get(
+            profile_type=self.tenant_profile_type.id, account=self.default_user
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(updated_profile.profile_pitch)
 
     def test_delete_profile(self):
         """

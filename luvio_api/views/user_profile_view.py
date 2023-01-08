@@ -37,7 +37,7 @@ class UserProfileListView(APIView):
         return Response(
             {
                 "message": "Successfully created profile!",
-                "profile_url": profile.profile_url,
+                "profile_uri": profile.profile_uri,
                 "profile_id": profile.id,
             },
             status=status.HTTP_201_CREATED,

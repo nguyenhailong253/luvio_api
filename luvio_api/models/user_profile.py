@@ -2,7 +2,11 @@ from datetime import datetime
 
 from django.db import models
 
-from luvio_api.common.constants import DATE_FORMAT, TEXT_FIELD_MAX_LENGTH
+from luvio_api.common.constants import (
+    DATE_FORMAT,
+    PUBLIC_PROFILE_URI_MAX_LENGTH,
+    TEXT_FIELD_MAX_LENGTH,
+)
 from luvio_api.models import Address, ProfileType, UserAccount
 
 
@@ -23,8 +27,8 @@ class UserProfile(models.Model):
     profile_pitch = models.CharField(
         max_length=TEXT_FIELD_MAX_LENGTH, null=True, blank=True, default=None
     )
-    profile_url = models.CharField(
-        max_length=TEXT_FIELD_MAX_LENGTH,
+    profile_uri = models.CharField(
+        max_length=PUBLIC_PROFILE_URI_MAX_LENGTH,
         null=True,
         blank=True,
         default=None,
