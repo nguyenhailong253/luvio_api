@@ -40,7 +40,7 @@ class UserProfileTestCase(TestCase):
 
         # Create an agent profile
         cls.agent_profile = UserProfile.objects.create(
-            avatar_link="https://img.com",
+            avatar="img.jpg",
             profile_pitch="Hi I'm a well known agent",
             profile_type=cls.agent_profile_type,
             profile_url="agenturl",
@@ -49,7 +49,7 @@ class UserProfileTestCase(TestCase):
 
         # Create a tenant profile
         cls.tenant_profile = UserProfile.objects.create(
-            avatar_link="https://img.com",
+            avatar="img.jpg",
             profile_pitch="Hi I'm a well known tenant",
             profile_type=cls.tenant_profile_type,
             profile_url="tenanturl",
@@ -117,7 +117,7 @@ class UserProfileTestCase(TestCase):
         expected_response = [
             {
                 "id": self.agent_profile.id,
-                "avatar_link": "https://img.com",
+                "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
                 "profile_pitch": "Hi I'm a well known agent",
                 "profile_url": "agenturl",
                 "date_created": self.agent_profile.date_created,
@@ -125,7 +125,7 @@ class UserProfileTestCase(TestCase):
             },
             {
                 "id": self.tenant_profile.id,
-                "avatar_link": "https://img.com",
+                "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
                 "profile_pitch": "Hi I'm a well known tenant",
                 "profile_url": "tenanturl",
                 "date_created": self.tenant_profile.date_created,
@@ -142,7 +142,7 @@ class UserProfileTestCase(TestCase):
         """
         response = self.client.get(f"/profiles/{self.tenant_profile.id}/").render()
         expected_response = {
-            "avatar_link": "https://img.com",
+            "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
             "profile_pitch": "Hi I'm a well known tenant",
             "profile_url": "tenanturl",
             "date_created": self.tenant_profile.date_created,
@@ -217,55 +217,66 @@ class UserProfileTestCase(TestCase):
         """
         Test create a profile
         """
-        response = self.client.post(
-            "/profiles/",
-            {
-                "avatar_link": "img.com",
-                "profile_pitch": "This is a tenant profile",
-                "profile_type": self.landlord_profile_type.id,
-                "profile_url": "url",
-            },
-        ).render()
+        with open("luvio_api/tests/static/captain.jpg", "rb") as img:
+            response = self.client.post(
+                "/profiles/",
+                {
+                    "avatar": img,
+                    "profile_pitch": "This is a test profile",
+                    "profile_type": self.landlord_profile_type.id,
+                    "profile_url": "url",
+                },
+                format="multipart",
+            ).render()
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(response.data["profile_id"])
+            creatd_profile = UserProfile.objects.get(pk=response.data["profile_id"])
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            self.assertEqual(creatd_profile.profile_pitch, "This is a test profile")
+            self.assertTrue(creatd_profile.avatar)
 
     def test_create_already_exist_profile(self):
         """
         Test create a profile which already exists
         """
-        response = self.client.post(
-            "/profiles/",
-            {
-                "avatar_link": "https://img.com",
-                "profile_pitch": "This is a duplicated profile",
-                "profile_type": self.agent_profile_type.id,
-                "profile_url": "testurl",
-            },
-        ).render()
+        with open("luvio_api/tests/static/captain.jpg", "rb") as img:
+            response = self.client.post(
+                "/profiles/",
+                {
+                    "avatar": img,
+                    "profile_pitch": "This is a duplicated profile",
+                    "profile_type": self.agent_profile_type.id,
+                    "profile_url": "testurl",
+                },
+                format="multipart",
+            ).render()
 
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+            self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
     def test_update_profile(self):
         """
         Test update existing profile
         """
-        response = self.client.put(
-            f"/profiles/{self.tenant_profile.id}/",
-            {
-                "avatar_link": "https://new_avatar.com",
-                "profile_pitch": "An update on my tenant profile",
-            },
-        ).render()
+        with open("luvio_api/tests/static/ironman.png", "rb") as img:
+            response = self.client.put(
+                f"/profiles/{self.tenant_profile.id}/",
+                {
+                    "avatar": img,
+                    "profile_pitch": "An update on my tenant profile",
+                },
+                format="multipart",
+            ).render()
 
-        updated_profile = UserProfile.objects.get(
-            profile_type=self.tenant_profile_type.id, account=self.default_user
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(updated_profile.avatar_link, "https://new_avatar.com")
-        self.assertEqual(
-            updated_profile.profile_pitch, "An update on my tenant profile"
-        )
+            updated_profile = UserProfile.objects.get(
+                profile_type=self.tenant_profile_type.id, account=self.default_user
+            )
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertIn(
+                "https://luvio-static-public.s3.amazonaws.com/avatars/ironman",
+                updated_profile.avatar.url,
+            )
+            self.assertEqual(
+                updated_profile.profile_pitch, "An update on my tenant profile"
+            )
 
     def test_delete_profile(self):
         """

@@ -25,7 +25,7 @@ create table if not exists application.user_profiles (
     id bigserial PRIMARY KEY,
     account_id bigserial NOT NULL,
     profile_type bigserial NOT NULL,
-    avatar_link text,
+    avatar text,
     profile_pitch text,
     profile_url text NOT NULL
 )
