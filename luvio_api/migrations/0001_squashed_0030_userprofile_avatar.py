@@ -9,42 +9,6 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    replaces = [
-        ("luvio_api", "0001_initial"),
-        ("luvio_api", "0002_alter_useraccount_id"),
-        ("luvio_api", "0003_userprofile"),
-        ("luvio_api", "0004_alter_userprofile_avatar_link_and_more"),
-        ("luvio_api", "0005_alter_userprofile_profile_url"),
-        ("luvio_api", "0006_stateandterritory_suburb"),
-        ("luvio_api", "0007_address"),
-        ("luvio_api", "0008_delete_address"),
-        ("luvio_api", "0009_address"),
-        ("luvio_api", "0010_tenantprofilesaddresses"),
-        ("luvio_api", "0011_alter_address_street_type_and_more"),
-        ("luvio_api", "0012_userprofile_date_created"),
-        ("luvio_api", "0013_alter_userprofile_date_created"),
-        ("luvio_api", "0014_agentprofilesaddresses"),
-        ("luvio_api", "0015_landlordprofilesaddresses"),
-        (
-            "luvio_api",
-            "0016_rename_end_date_landlordprofilesaddresses_ownership_end_date_and_more",
-        ),
-        ("luvio_api", "0017_profilesaddresses_and_more"),
-        ("luvio_api", "0018_alter_profilesaddresses_management_end_date_and_more"),
-        ("luvio_api", "0019_remove_userprofile_profile_url"),
-        ("luvio_api", "0020_remove_userprofile_avatar_link"),
-        ("luvio_api", "0021_userprofile_avatar_link_userprofile_profile_url"),
-        ("luvio_api", "0022_remove_useraccount_mobile"),
-        ("luvio_api", "0023_useraccount_mobile"),
-        ("luvio_api", "0024_alter_address_street_type_and_more"),
-        ("luvio_api", "0025_alter_userprofile_date_created"),
-        ("luvio_api", "0026_alter_userprofile_date_created"),
-        ("luvio_api", "0027_remove_userprofile_avatar_link_and_more"),
-        ("luvio_api", "0028_userprofile_avatar_link"),
-        ("luvio_api", "0029_remove_userprofile_avatar_link"),
-        ("luvio_api", "0030_userprofile_avatar"),
-    ]
-
     initial = True
 
     dependencies = [
