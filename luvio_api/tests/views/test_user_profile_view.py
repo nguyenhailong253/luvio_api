@@ -372,11 +372,14 @@ class UserProfileTestCase(TestCase):
 
     def test_get_public_profile(self):
         """
-        Test get details of public profile
+        Test get details of public profile - open for unauthenticated clients
         """
-        response = self.client.get(
-            f"/profiles/public/{self.tenant_profile.profile_uri}/"
-        ).render()
+        # Use an unauthenticated client
+        response = (
+            APIClient()
+            .get(f"/profiles/public/{self.tenant_profile.profile_uri}/")
+            .render()
+        )
         expected_response = {
             "avatar": "https://luvio-static-public.s3.amazonaws.com/img.jpg",
             "profile_pitch": "Hi I'm a well known tenant",

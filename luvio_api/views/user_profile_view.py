@@ -1,6 +1,7 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -91,6 +92,7 @@ class UserProfileDetailView(APIView):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_public_profile(request: Request, profile_uri: str) -> Response:
     """
     Get public user profile using profile uri
